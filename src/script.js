@@ -75,7 +75,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(1, 5, -5);
+camera.position.set(-15, 0, -5);
 // camera.rotation.x = 5;
 scene.add(camera);
 
@@ -111,7 +111,7 @@ line.material.depthTest = false;
 line.material.color.r = 1;
 line.material.color.g = 1;
 line.material.color.b = 1;
-line.material.opacity = 0.5;
+line.material.opacity = 1.0;
 line.material.transparent = false;
 
 // Inner Sphere
