@@ -394,7 +394,6 @@ const tick = () => {
   // Debug Object check
 
   // sphere.parameters.radius = debugObject.radius;
-
   // sphere.geometry.position debugObject.radius
 
   // Update controls
