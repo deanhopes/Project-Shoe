@@ -75,8 +75,8 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(7.87, 5.01, -7.44);
-camera.rotation.x = 5;
+camera.position.set(1, 5, -5);
+// camera.rotation.x = 5;
 scene.add(camera);
 
 gui.add(camera.position, 'x').min(-10).max(10).step(0.01).name('Camera X');
