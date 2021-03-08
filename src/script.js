@@ -131,10 +131,186 @@ gui.add(debugObject, 'radius').min(0).max(16);
  * Font Loader
  */
 
+// Function for a name generator
+
 const fontLoader = new THREE.FontLoader();
-for (let i = 0; i < 50; i++) {
+for (let i = 0; i < 5; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('Beanos', {
+    const textGeometry = new THREE.TextGeometry('Pressure', {
+      font: font,
+      size: Math.random() * 0.5,
+      height: Math.random(),
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.01,
+      bevelSize: 0.02,
+      bevelOffset: 0,
+      bevelSegments: 2,
+      // castShadow: true,
+    });
+    const textMaterial = new THREE.MeshNormalMaterial();
+    textMaterial.flatShading = true;
+    textMaterial.displacementBias = 10.5;
+    const text = new THREE.Mesh(textGeometry, textMaterial);
+    text.position.y = (Math.random() - 0.5) * 10;
+    text.position.x = (Math.random() - 0.5) * 10;
+    text.position.z = (Math.random() - 0.5) * 10;
+    // text.rotation.x = 0;
+    // text.rotation.y = 0;
+    // text.rotation.z = 0;
+    // font.castShadow = true;
+    text.lookAt(sphere);
+    scene.add(text);
+  });
+}
+for (let i = 0; i < 15; i++) {
+  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
+    const textGeometry = new THREE.TextGeometry('"Gen-z"', {
+      font: font,
+      size: Math.random() * 0.5,
+      height: Math.random(),
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.01,
+      bevelSize: 0.02,
+      bevelOffset: 0,
+      bevelSegments: 2,
+      // castShadow: true,
+    });
+    const textMaterial = new THREE.MeshNormalMaterial();
+    textMaterial.flatShading = true;
+    textMaterial.displacementBias = 10.5;
+    const text = new THREE.Mesh(textGeometry, textMaterial);
+    text.position.y = (Math.random() - 0.5) * 10;
+    text.position.x = (Math.random() - 0.5) * 10;
+    text.position.z = (Math.random() - 0.5) * 10;
+    // text.rotation.x = 0;
+    // text.rotation.y = 0;
+    // text.rotation.z = 0;
+    // font.castShadow = true;
+
+    scene.add(text);
+  });
+}
+for (let i = 0; i < 15; i++) {
+  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
+    const textGeometry = new THREE.TextGeometry('"Edgy"', {
+      font: font,
+      size: Math.random() * 0.5,
+      height: Math.random(),
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.01,
+      bevelSize: 0.02,
+      bevelOffset: 0,
+      bevelSegments: 2,
+      // castShadow: true,
+    });
+    const textMaterial = new THREE.MeshNormalMaterial();
+    textMaterial.flatShading = true;
+    textMaterial.displacementBias = 10.5;
+    const text = new THREE.Mesh(textGeometry, textMaterial);
+    text.position.y = (Math.random() - 0.5) * 10;
+    text.position.x = (Math.random() - 0.5) * 10;
+    text.position.z = (Math.random() - 0.5) * 10;
+    // text.rotation.x = 0;
+    // text.rotation.y = 0;
+    // text.rotation.z = 0;
+    // font.castShadow = true;
+
+    scene.add(text);
+  });
+}
+for (let i = 0; i < 15; i++) {
+  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
+    const textGeometry = new THREE.TextGeometry('"Urban"', {
+      font: font,
+      size: Math.random() * 0.5,
+      height: Math.random(),
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.01,
+      bevelSize: 0.02,
+      bevelOffset: 0,
+      bevelSegments: 2,
+      // castShadow: true,
+    });
+    const textMaterial = new THREE.MeshNormalMaterial();
+    textMaterial.flatShading = true;
+    textMaterial.displacementBias = 10.5;
+    const text = new THREE.Mesh(textGeometry, textMaterial);
+    text.position.y = (Math.random() - 0.5) * 10;
+    text.position.x = (Math.random() - 0.5) * 10;
+    text.position.z = (Math.random() - 0.5) * 10;
+    // text.rotation.x = 0;
+    // text.rotation.y = 0;
+    // text.rotation.z = 0;
+    // font.castShadow = true;
+
+    scene.add(text);
+  });
+}
+for (let i = 0; i < 15; i++) {
+  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
+    const textGeometry = new THREE.TextGeometry('"Hustle"', {
+      font: font,
+      size: Math.random() * 0.5,
+      height: Math.random(),
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.01,
+      bevelSize: 0.02,
+      bevelOffset: 0,
+      bevelSegments: 2,
+      // castShadow: true,
+    });
+    const textMaterial = new THREE.MeshNormalMaterial();
+    textMaterial.flatShading = true;
+    textMaterial.displacementBias = 10.5;
+    const text = new THREE.Mesh(textGeometry, textMaterial);
+    text.position.y = (Math.random() - 0.5) * 10;
+    text.position.x = (Math.random() - 0.5) * 10;
+    text.position.z = (Math.random() - 0.5) * 10;
+    // text.rotation.x = 0;
+    // text.rotation.y = 0;
+    // text.rotation.z = 0;
+    // font.castShadow = true;
+
+    scene.add(text);
+  });
+}
+for (let i = 0; i < 5; i++) {
+  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
+    const textGeometry = new THREE.TextGeometry('"Buy this"', {
+      font: font,
+      size: Math.random() * 0.5,
+      height: Math.random(),
+      curveSegments: 12,
+      bevelEnabled: true,
+      bevelThickness: 0.01,
+      bevelSize: 0.02,
+      bevelOffset: 0,
+      bevelSegments: 2,
+      // castShadow: true,
+    });
+    const textMaterial = new THREE.MeshNormalMaterial();
+    textMaterial.flatShading = true;
+    textMaterial.displacementBias = 10.5;
+    const text = new THREE.Mesh(textGeometry, textMaterial);
+    text.position.y = (Math.random() - 0.5) * 10;
+    text.position.x = (Math.random() - 0.5) * 10;
+    text.position.z = (Math.random() - 0.5) * 10;
+    // text.rotation.x = 0;
+    // text.rotation.y = 0;
+    // text.rotation.z = 0;
+    // font.castShadow = true;
+
+    scene.add(text);
+  });
+}
+for (let i = 0; i < 5; i++) {
+  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
+    const textGeometry = new THREE.TextGeometry('"Make it pop"', {
       font: font,
       size: Math.random() * 0.5,
       height: Math.random(),
