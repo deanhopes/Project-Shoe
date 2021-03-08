@@ -5,6 +5,8 @@ import Stats from 'stats.js';
 import { GUI } from 'dat.gui';
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js';
 
+// Link to the host site: https://naughty-dubinsky-b1df58.netlify.app/
+
 /**
  * Stats
  */
@@ -103,7 +105,7 @@ const wireframe = new THREE.WireframeGeometry(geometry);
 const line = new THREE.LineSegments(wireframe);
 
 line.material.depthTest = false;
-console.log(line.material);
+// console.log(line.material);
 line.material.color.r = 1;
 line.material.color.g = 1;
 line.material.color.b = 1;
@@ -117,20 +119,17 @@ const sphere = new THREE.Mesh(
   new THREE.SphereGeometry(debugObject.radius, 32, 32),
   material
 );
-console.log(sphere.geometry);
-
 // Add the wireframe and sphere
 scene.add(line, sphere);
 
 // Add a d3bug object that
 gui.add(debugObject, 'radius').min(0).max(16);
-console.log(debugObject.radius);
 
 /**
  * Font Loader
  */
 const fontLoader = new THREE.FontLoader();
-for (let i = 0; i < 45; i++) {
+for (let i = 0; i < 50; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
     const textGeometry = new THREE.TextGeometry('Ratatouille', {
       font: font,
@@ -152,7 +151,7 @@ for (let i = 0; i < 45; i++) {
     // text.rotation.x = 0;
     // text.rotation.y = 0;
     // text.rotation.z = 0;
-    font.castShadow = true;
+    // font.castShadow = true;
     text.lookAt(sphere.position);
     scene.add(text);
   });
@@ -176,24 +175,26 @@ renderer.setPixelRatio(window.devicePixelRatio);
  * Lights
  */
 
-// const pointLight3 = new THREE.PointLight('red', 1);
-// const pointLight = new THREE.PointLight('white', 1);
-// const pointLight2 = new THREE.PointLight('blue', 1);
-// scene.add(pointLight, pointLight2, pointLight3);
+const pointLight3 = new THREE.PointLight('red', 1);
+const pointLight = new THREE.PointLight('white', 1);
+const pointLight2 = new THREE.PointLight('blue', 1);
+scene.add(pointLight);
+const pointLightHelper = new THREE.PointLightHelper(pointLight);
+scene.add(pointLightHelper);
 
 // const rectLight = new THREE.RectAreaLight('red', 1, -5, 5);
-const rectLight1 = new THREE.RectAreaLight('white', 200, 5, 5);
-const rectLight2 = new THREE.RectAreaLight('white', 200, -5, -5);
-rectLight1.width = 1;
-rectLight1.height = 1;
-rectLight2.width = -1;
-rectLight2.height = -1;
-// console.log(rectLight1);
-// const rectLight2 = new THREE.RectAreaLight('blue', 1, 5, 5);
-scene.add(rectLight1, rectLight2);
-const rectLightHelper1 = new RectAreaLightHelper(rectLight1);
-const rectLightHelper2 = new RectAreaLightHelper(rectLight2);
-scene.add(rectLightHelper1, rectLightHelper2);
+// const rectLight1 = new THREE.RectAreaLight('white', 200, 5, 5);
+// const rectLight2 = new THREE.RectAreaLight('white', 200, -5, -5);
+// rectLight1.width = 1;
+// rectLight1.height = 1;
+// rectLight2.width = -1;
+// rectLight2.height = -1;
+// // console.log(rectLight1);
+// // const rectLight2 = new THREE.RectAreaLight('blue', 1, 5, 5);
+// scene.add(rectLight1, rectLight2);
+// const rectLightHelper1 = new RectAreaLightHelper(rectLight1);
+// const rectLightHelper2 = new RectAreaLightHelper(rectLight2);
+// scene.add(rectLightHelper1, rectLightHelper2);
 
 /**
  * Tips
