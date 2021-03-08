@@ -70,7 +70,7 @@ window.addEventListener('resize', () => {
 
 // Base camera
 const camera = new THREE.PerspectiveCamera(
-  75,
+  105,
   sizes.width / sizes.height,
   0.1,
   100
@@ -100,9 +100,11 @@ gui.add(controls, 'autoRotate').name('Auto Rotate');
  */
 
 // Sphere Wireframe
-const geometry = new THREE.SphereGeometry(5, 32, 32);
+const geometry = new THREE.SphereGeometry(5, 164, 164);
 const wireframe = new THREE.WireframeGeometry(geometry);
 const line = new THREE.LineSegments(wireframe);
+
+console.log(line);
 
 line.material.depthTest = false;
 // console.log(line.material);
