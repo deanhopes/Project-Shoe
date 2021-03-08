@@ -130,10 +130,11 @@ gui.add(debugObject, 'radius').min(0).max(16);
 /**
  * Font Loader
  */
+
 const fontLoader = new THREE.FontLoader();
 for (let i = 0; i < 50; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('Ratatouille', {
+    const textGeometry = new THREE.TextGeometry('Beanos', {
       font: font,
       size: Math.random() * 0.5,
       height: Math.random(),
@@ -145,7 +146,9 @@ for (let i = 0; i < 50; i++) {
       bevelSegments: 2,
       // castShadow: true,
     });
-    const textMaterial = new THREE.MeshPhysicalMaterial();
+    const textMaterial = new THREE.MeshNormalMaterial();
+    textMaterial.flatShading = true;
+    textMaterial.displacementBias = 10.5;
     const text = new THREE.Mesh(textGeometry, textMaterial);
     text.position.y = (Math.random() - 0.5) * 10;
     text.position.x = (Math.random() - 0.5) * 10;
@@ -154,7 +157,7 @@ for (let i = 0; i < 50; i++) {
     // text.rotation.y = 0;
     // text.rotation.z = 0;
     // font.castShadow = true;
-    text.lookAt(sphere.position);
+
     scene.add(text);
   });
 }
@@ -177,9 +180,7 @@ renderer.setPixelRatio(window.devicePixelRatio);
  * Lights
  */
 
-const pointLight3 = new THREE.PointLight('red', 1);
-const pointLight = new THREE.PointLight('white', 1);
-const pointLight2 = new THREE.PointLight('blue', 1);
+const pointLight = new THREE.PointLight('white', 1.0);
 scene.add(pointLight);
 const pointLightHelper = new THREE.PointLightHelper(pointLight);
 scene.add(pointLightHelper);
@@ -296,7 +297,7 @@ scene.add(pointLightHelper);
 // Tip 22 -- Create multiple box geometries with random rotations and positions with one draw call
 const cubeGeometry = new THREE.SphereGeometry(0.1, 32, 32);
 
-const cubeMaterial = new THREE.MeshDepthMaterial();
+const cubeMaterial = new THREE.MeshBasicMaterial();
 
 const mesh = new THREE.InstancedMesh(cubeGeometry, cubeMaterial, 400);
 // Add this for better performance
