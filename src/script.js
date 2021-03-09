@@ -95,7 +95,7 @@ gui.add(camera.position, 'z').min(-10).max(10).step(0.01).name('Camera Z');
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-// controls.autoRotate = true;
+controls.autoRotate = true;
 gui.add(controls, 'autoRotate').name('Auto Rotate');
 
 /**
