@@ -85,7 +85,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(0, -5, 3.4);
+camera.position.set(0, -5, 6.43);
 scene.add(camera);
 
 gui.add(camera.position, 'x').min(-10).max(10).step(0.01).name('Camera X');
@@ -128,7 +128,7 @@ pointSpheres();
 const fontLoader = new THREE.FontLoader();
 for (let i = 0; i < 25; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('shineys?', {
+    const textGeometry = new THREE.TextGeometry('shiney', {
       font: font,
       size: (Math.random() - 0.5) * 2,
       height: Math.random() * 0.1,
