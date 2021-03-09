@@ -6,6 +6,7 @@ import { GUI } from 'dat.gui';
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js';
 import testVertexShader from '/shaders/test/vertex.vs.glsl';
 import testFragmentShader from '/shaders/test/fragment.fs.glsl';
+// import CANNON from 'cannon';
 
 // Link to the host site: https://naughty-dubinsky-b1df58.netlify.app/
 
@@ -19,10 +20,16 @@ document.body.appendChild(stats.dom);
 /**
  * Debug object
  */
-const debugObject = {
-  radius: 0.3,
-};
+// const debugObject = {
+//   radius: 0.3,
+// };
 
+const cursor = { x: 0, y: 0 };
+
+window.addEventListener('mousemove', (e) => {
+  cursor.x = e.clientX / sizes.width - 0.5;
+  cursor.y = -(e.clientY / sizes.height) - 0.5;
+});
 /**
  * Base
  */
@@ -39,6 +46,7 @@ const gui = new GUI();
 /**
  * Textures
  */
+// How to load texture loaders and a displacement texture
 // const textureLoader = new THREE.TextureLoader();
 // const displacementTexture = textureLoader.load(
 //   './textures/displacementMap.png'
@@ -77,9 +85,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(0, -5, -5);
-camera.rotation.set(150, 0, 0);
-// camera.rotation.x = 5;
+camera.position.set(0, -5, 3.4);
 scene.add(camera);
 
 gui.add(camera.position, 'x').min(-10).max(10).step(0.01).name('Camera X');
@@ -88,57 +94,43 @@ gui.add(camera.position, 'z').min(-10).max(10).step(0.01).name('Camera Z');
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
-// Alternative controls, maybe good for design
-// controls.mouseButtons = {
-//   LEFT: THREE.MOUSE.RIGHT,
-//   MIDDLE: THREE.MOUSE.MIDDLE,
-//   RIGHT: THREE.MOUSE.LEFT,
-// };
 controls.enableDamping = true;
 // controls.autoRotate = true;
 gui.add(controls, 'autoRotate').name('Auto Rotate');
 
 /**
- * Test Mesh
+ * Objects
  */
 
-// Sphere Wireframe
-const geometry = new THREE.BoxGeometry(5, 164, 164);
-const wireframe = new THREE.WireframeGeometry(geometry);
-const line = new THREE.LineSegments(wireframe);
+const cubeGeometry = new THREE.SphereGeometry(0.2, 32, 32);
 
-console.log(line);
+const pointSpheres = () => {
+  for (let i = 0; i < 50; i++) {
+    const material = new THREE.MeshNormalMaterial();
 
-line.material.depthTest = false;
-// console.log(line.material);
-line.material.color.r = 1;
-line.material.color.g = 1;
-line.material.color.b = 1;
-line.material.opacity = 1.0;
-line.material.transparent = false;
+    const mesh = new THREE.Points(cubeGeometry, material);
+    mesh.position.x = (Math.random() - 0.5) * 10;
+    mesh.position.y = (Math.random() - 0.5) * 10;
+    mesh.position.z = (Math.random() - 0.5) * 10;
+    mesh.rotation.x = (Math.random() - 0.5) * 10;
+    mesh.rotation.y = (Math.random() - 0.5) * Math.PI * 2;
 
-// Inner Sphere
-const material = new THREE.MeshToonMaterial();
-material.flatShading = true;
-const sphere = new THREE.Mesh(new THREE.BoxGeometry(64, 64, 64), material);
-// Add the wireframe and sphere
-scene.add(sphere, line);
-
-// Add a d3bug object that
-gui.add(debugObject, 'radius').min(0).max(16);
+    scene.add(mesh);
+  }
+};
+pointSpheres();
 
 /**
  * Font Loader
  */
 
 // Function for a name generator
-
 const fontLoader = new THREE.FontLoader();
 for (let i = 0; i < 25; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('woke', {
+    const textGeometry = new THREE.TextGeometry('shineys?', {
       font: font,
-      size: Math.random() * 0.5 * 2,
+      size: (Math.random() - 0.5) * 2,
       height: Math.random() * 0.1,
       curveSegments: 24,
       bevelEnabled: true,
@@ -149,16 +141,12 @@ for (let i = 0; i < 25; i++) {
       // castShadow: true,
     });
     const textMaterial = new THREE.MeshNormalMaterial();
-    textMaterial.flatShading = true;
+    textMaterial.flatShading = false;
     textMaterial.displacementBias = 10.5;
     const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 10;
-    text.position.x = (Math.random() - 0.5) * 10;
-    text.position.z = (Math.random() - 0.5) * 10;
-    // text.rotation.x = 0;
-    // text.rotation.y = 0;
-    // text.rotation.z = 0;
-    // font.castShadow = true;
+    text.position.y = (Math.random() - 0.5) * 15;
+    text.position.x = (Math.random() - 0.5) * 15;
+    text.position.z = (Math.random() - 0.5) * 15;
     text.lookAt(camera.position);
     scene.add(text);
   });
@@ -178,6 +166,25 @@ const renderer = new THREE.WebGLRenderer({
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(window.devicePixelRatio);
 
+// Shaders
+// // Tip 29
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+// // Tip 31, 32, 34 and 35
+const shaderGeometry = new THREE.BoxGeometry(15, 15, 15, 25, 25, 25);
+
+const shaderMaterial = new THREE.RawShaderMaterial({
+  vertexShader: testVertexShader,
+  fragmentShader: testFragmentShader,
+  wireframe: true,
+});
+
+const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial);
+shaderMesh.rotation.x = Math.sin(Math.PI) * 10;
+shaderMesh.rotation.y = Math.sin(Math.PI) * 10;
+shaderMesh.rotation.z = Math.sin(Math.PI) * 10;
+scene.add(shaderMesh);
+
 /**
  * Lights
  */
@@ -186,22 +193,38 @@ const pointLight = new THREE.PointLight('red', 1.0);
 const pointLight1 = new THREE.PointLight('blue', 1.0);
 const pointLight2 = new THREE.PointLight('green', 1.0);
 scene.add(pointLight, pointLight1, pointLight2);
-// const pointLightHelper = new THREE.PointLightHelper(pointLight);
-// scene.add(pointLightHelper);
 
-// const rectLight = new THREE.RectAreaLight('red', 1, -5, 5);
-// const rectLight1 = new THREE.RectAreaLight('white', 200, 5, 5);
-// const rectLight2 = new THREE.RectAreaLight('blue', 200, -5, -5);
-// rectLight1.width = 51;
-// rectLight1.height = 51;
-// rectLight2.width = -51;
-// rectLight2.height = -51;
-// // console.log(rectLight1);
-// // const rectLight2 = new THREE.RectAreaLight('blue', 1, 5, 5);
-// scene.add(rectLight1, rectLight2);
-// const rectLightHelper1 = new RectAreaLightHelper(rectLight1);
-// const rectLightHelper2 = new RectAreaLightHelper(rectLight2);
-// scene.add(rectLightHelper1, rectLightHelper2);
+/**
+ * Animation
+ */
+
+const clock = new THREE.Clock();
+
+const tick = () => {
+  stats.begin();
+
+  const elapsedTime = clock.getElapsedTime();
+
+  // Update Camera
+  camera.position.x = cursor.x * 3;
+  camera.position.y = cursor.y * 3;
+
+  // sphere.parameters.radius = debugObject.radius;
+  // sphere.geometry.position debugObject.radius
+
+  // Update controls
+  controls.update();
+
+  // Render
+  renderer.render(scene, camera);
+
+  // Call tick again on the next frame
+  window.requestAnimationFrame(tick);
+
+  stats.end();
+};
+
+tick();
 
 /**
  * Tips
@@ -282,24 +305,28 @@ scene.add(pointLight, pointLight1, pointLight2);
 // }
 
 // // Tip 20
-const cubeGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+// const cubeGeometry = new THREE.SphereGeometry(0.2, 32, 32);
 
-for (let i = 0; i < 50; i++) {
-  const material = new THREE.PointsMaterial({
-    size: 0.005,
-    color: '#CCFFFF',
-    // sizeAttenuation: true,
-  });
+// const pointSpheres = (elapsedTime) => {
+//   for (let i = 0; i < 50; i++) {
+//     const material = new THREE.PointsMaterial({
+//       size: 0.005,
+//       color: '#CCFFFF',
+//       // sizeAttenuation: true,
+//     });
 
-  const mesh = new THREE.Points(cubeGeometry, material);
-  mesh.position.x = (Math.random() - 0.5) * 10;
-  mesh.position.y = (Math.random() - 0.5) * 10;
-  mesh.position.z = (Math.random() - 0.5) * 10;
-  mesh.rotation.x = (Math.random() - 0.5) * Math.PI * 2;
-  mesh.rotation.y = (Math.random() - 0.5) * Math.PI * 2;
+//     const mesh = new THREE.Points(cubeGeometry, material);
+//     mesh.position.x = (Math.random() - 0.5) * 10;
+//     mesh.position.y = (Math.random() - 0.5) * 10;
+//     mesh.position.z = (Math.random() - 0.5) * 10;
+//     mesh.rotation.x = Math.sin(
+//       elapsedTime + (Math.random() - 0.5) * Math.PI * 2
+//     );
+//     mesh.rotation.y = (Math.random() - 0.5) * Math.PI * 2;
 
-  scene.add(mesh);
-}
+//     scene.add(mesh);
+//   }
+// };
 
 // // Tip 22 -- Create multiple box geometries with random rotations and positions with one draw call
 // const cubeGeometry = new THREE.SphereGeometry(0.1, 32, 32);
@@ -332,56 +359,3 @@ for (let i = 0; i < 50; i++) {
 //   matrix.setPosition(position);
 //   mesh.setMatrixAt(i, matrix);
 // }
-
-// // Tip 29
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-
-// // Tip 31, 32, 34 and 35
-const shaderGeometry = new THREE.BoxGeometry(15, 15, 15, 25, 25, 25);
-
-const shaderMaterial = new THREE.RawShaderMaterial({
-  vertexShader: testVertexShader,
-  fragmentShader: testFragmentShader,
-  wireframe: true,
-});
-
-const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial);
-// shaderMesh.rotation.x = Math.sin(Math.PI) * 10;
-// shaderMesh.rotation.y = Math.sin(Math.PI) * 10;
-// shaderMesh.rotation.z = Math.sin(Math.PI) * 10;
-scene.add(shaderMesh);
-
-/**
- * Animation
- */
-
-const clock = new THREE.Clock();
-
-const tick = () => {
-  stats.begin();
-
-  const elapsedTime = clock.getElapsedTime();
-
-  // Update Camera
-  // camera.position.x = Math.sin(elapsedTime) * 2;
-  // camera.position.y = -Math.sin(elapsedTime * 2);
-  // camera.position.z = elapsedTime * 2;
-
-  // Debug Object check
-
-  // sphere.parameters.radius = debugObject.radius;
-  // sphere.geometry.position debugObject.radius
-
-  // Update controls
-  controls.update();
-
-  // Render
-  renderer.render(scene, camera);
-
-  // Call tick again on the next frame
-  window.requestAnimationFrame(tick);
-
-  stats.end();
-};
-
-tick();
