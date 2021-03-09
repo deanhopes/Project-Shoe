@@ -4,6 +4,8 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Stats from 'stats.js';
 import { GUI } from 'dat.gui';
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js';
+import testVertexShader from '/shaders/test/vertex.vs.glsl';
+import testFragmentShader from '/shaders/test/fragment.fs.glsl';
 
 // Link to the host site: https://naughty-dubinsky-b1df58.netlify.app/
 
@@ -37,10 +39,10 @@ const gui = new GUI();
 /**
  * Textures
  */
-const textureLoader = new THREE.TextureLoader();
-const displacementTexture = textureLoader.load(
-  './textures/displacementMap.png'
-);
+// const textureLoader = new THREE.TextureLoader();
+// const displacementTexture = textureLoader.load(
+//   './textures/displacementMap.png'
+// );
 
 /**
  * Sizes
@@ -70,12 +72,12 @@ window.addEventListener('resize', () => {
 
 // Base camera
 const camera = new THREE.PerspectiveCamera(
-  105,
+  125,
   sizes.width / sizes.height,
   0.1,
   100
 );
-camera.position.set(-15, 0, -5);
+camera.position.set(0, -5, -5);
 // camera.rotation.x = 5;
 scene.add(camera);
 
@@ -92,7 +94,7 @@ const controls = new OrbitControls(camera, canvas);
 //   RIGHT: THREE.MOUSE.LEFT,
 // };
 controls.enableDamping = true;
-controls.autoRotate = true;
+// controls.autoRotate = true;
 gui.add(controls, 'autoRotate').name('Auto Rotate');
 
 /**
@@ -100,7 +102,7 @@ gui.add(controls, 'autoRotate').name('Auto Rotate');
  */
 
 // Sphere Wireframe
-const geometry = new THREE.SphereGeometry(5, 164, 164);
+const geometry = new THREE.BoxGeometry(5, 164, 164);
 const wireframe = new THREE.WireframeGeometry(geometry);
 const line = new THREE.LineSegments(wireframe);
 
@@ -115,14 +117,18 @@ line.material.opacity = 1.0;
 line.material.transparent = false;
 
 // Inner Sphere
-const material = new THREE.MeshBasicMaterial();
+const material = new THREE.PointsMaterial({
+  size: 0.02,
+  sizeAttenuation: true,
+});
+
 material.flatShading = true;
 const sphere = new THREE.Mesh(
-  new THREE.SphereGeometry(debugObject.radius, 32, 32),
+  new THREE.SphereGeometry(debugObject.radius, 64, 64),
   material
 );
 // Add the wireframe and sphere
-scene.add(line, sphere);
+scene.add(sphere);
 
 // Add a d3bug object that
 gui.add(debugObject, 'radius').min(0).max(16);
@@ -134,15 +140,15 @@ gui.add(debugObject, 'radius').min(0).max(16);
 // Function for a name generator
 
 const fontLoader = new THREE.FontLoader();
-for (let i = 0; i < 5; i++) {
+for (let i = 0; i < 25; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('Pressure', {
+    const textGeometry = new THREE.TextGeometry('woke', {
       font: font,
-      size: Math.random() * 0.5,
-      height: Math.random(),
-      curveSegments: 12,
+      size: Math.random() * 0.5 * 2,
+      height: Math.random() * 0.1,
+      curveSegments: 24,
       bevelEnabled: true,
-      bevelThickness: 0.01,
+      bevelThickness: 0.5,
       bevelSize: 0.02,
       bevelOffset: 0,
       bevelSegments: 2,
@@ -159,181 +165,7 @@ for (let i = 0; i < 5; i++) {
     // text.rotation.y = 0;
     // text.rotation.z = 0;
     // font.castShadow = true;
-    text.lookAt(sphere);
-    scene.add(text);
-  });
-}
-for (let i = 0; i < 15; i++) {
-  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('"Gen-z"', {
-      font: font,
-      size: Math.random() * 0.5,
-      height: Math.random(),
-      curveSegments: 12,
-      bevelEnabled: true,
-      bevelThickness: 0.01,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      bevelSegments: 2,
-      // castShadow: true,
-    });
-    const textMaterial = new THREE.MeshNormalMaterial();
-    textMaterial.flatShading = true;
-    textMaterial.displacementBias = 10.5;
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 10;
-    text.position.x = (Math.random() - 0.5) * 10;
-    text.position.z = (Math.random() - 0.5) * 10;
-    // text.rotation.x = 0;
-    // text.rotation.y = 0;
-    // text.rotation.z = 0;
-    // font.castShadow = true;
-
-    scene.add(text);
-  });
-}
-for (let i = 0; i < 15; i++) {
-  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('"Edgy"', {
-      font: font,
-      size: Math.random() * 0.5,
-      height: Math.random(),
-      curveSegments: 12,
-      bevelEnabled: true,
-      bevelThickness: 0.01,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      bevelSegments: 2,
-      // castShadow: true,
-    });
-    const textMaterial = new THREE.MeshNormalMaterial();
-    textMaterial.flatShading = true;
-    textMaterial.displacementBias = 10.5;
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 10;
-    text.position.x = (Math.random() - 0.5) * 10;
-    text.position.z = (Math.random() - 0.5) * 10;
-    // text.rotation.x = 0;
-    // text.rotation.y = 0;
-    // text.rotation.z = 0;
-    // font.castShadow = true;
-
-    scene.add(text);
-  });
-}
-for (let i = 0; i < 15; i++) {
-  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('"Urban"', {
-      font: font,
-      size: Math.random() * 0.5,
-      height: Math.random(),
-      curveSegments: 12,
-      bevelEnabled: true,
-      bevelThickness: 0.01,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      bevelSegments: 2,
-      // castShadow: true,
-    });
-    const textMaterial = new THREE.MeshNormalMaterial();
-    textMaterial.flatShading = true;
-    textMaterial.displacementBias = 10.5;
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 10;
-    text.position.x = (Math.random() - 0.5) * 10;
-    text.position.z = (Math.random() - 0.5) * 10;
-    // text.rotation.x = 0;
-    // text.rotation.y = 0;
-    // text.rotation.z = 0;
-    // font.castShadow = true;
-
-    scene.add(text);
-  });
-}
-for (let i = 0; i < 15; i++) {
-  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('"Hustle"', {
-      font: font,
-      size: Math.random() * 0.5,
-      height: Math.random(),
-      curveSegments: 12,
-      bevelEnabled: true,
-      bevelThickness: 0.01,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      bevelSegments: 2,
-      // castShadow: true,
-    });
-    const textMaterial = new THREE.MeshNormalMaterial();
-    textMaterial.flatShading = true;
-    textMaterial.displacementBias = 10.5;
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 10;
-    text.position.x = (Math.random() - 0.5) * 10;
-    text.position.z = (Math.random() - 0.5) * 10;
-    // text.rotation.x = 0;
-    // text.rotation.y = 0;
-    // text.rotation.z = 0;
-    // font.castShadow = true;
-
-    scene.add(text);
-  });
-}
-for (let i = 0; i < 5; i++) {
-  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('"Buy this"', {
-      font: font,
-      size: Math.random() * 0.5,
-      height: Math.random(),
-      curveSegments: 12,
-      bevelEnabled: true,
-      bevelThickness: 0.01,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      bevelSegments: 2,
-      // castShadow: true,
-    });
-    const textMaterial = new THREE.MeshNormalMaterial();
-    textMaterial.flatShading = true;
-    textMaterial.displacementBias = 10.5;
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 10;
-    text.position.x = (Math.random() - 0.5) * 10;
-    text.position.z = (Math.random() - 0.5) * 10;
-    // text.rotation.x = 0;
-    // text.rotation.y = 0;
-    // text.rotation.z = 0;
-    // font.castShadow = true;
-
-    scene.add(text);
-  });
-}
-for (let i = 0; i < 5; i++) {
-  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('"Make it pop"', {
-      font: font,
-      size: Math.random() * 0.5,
-      height: Math.random(),
-      curveSegments: 12,
-      bevelEnabled: true,
-      bevelThickness: 0.01,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      bevelSegments: 2,
-      // castShadow: true,
-    });
-    const textMaterial = new THREE.MeshNormalMaterial();
-    textMaterial.flatShading = true;
-    textMaterial.displacementBias = 10.5;
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 10;
-    text.position.x = (Math.random() - 0.5) * 10;
-    text.position.z = (Math.random() - 0.5) * 10;
-    // text.rotation.x = 0;
-    // text.rotation.y = 0;
-    // text.rotation.z = 0;
-    // font.castShadow = true;
-
+    text.lookAt(camera.position);
     scene.add(text);
   });
 }
@@ -356,18 +188,20 @@ renderer.setPixelRatio(window.devicePixelRatio);
  * Lights
  */
 
-const pointLight = new THREE.PointLight('white', 1.0);
-scene.add(pointLight);
-const pointLightHelper = new THREE.PointLightHelper(pointLight);
-scene.add(pointLightHelper);
+const pointLight = new THREE.PointLight('red', 1.0);
+const pointLight1 = new THREE.PointLight('blue', 1.0);
+const pointLight2 = new THREE.PointLight('green', 1.0);
+scene.add(pointLight, pointLight1, pointLight2);
+// const pointLightHelper = new THREE.PointLightHelper(pointLight);
+// scene.add(pointLightHelper);
 
 // const rectLight = new THREE.RectAreaLight('red', 1, -5, 5);
 // const rectLight1 = new THREE.RectAreaLight('white', 200, 5, 5);
-// const rectLight2 = new THREE.RectAreaLight('white', 200, -5, -5);
-// rectLight1.width = 1;
-// rectLight1.height = 1;
-// rectLight2.width = -1;
-// rectLight2.height = -1;
+// const rectLight2 = new THREE.RectAreaLight('blue', 200, -5, -5);
+// rectLight1.width = 51;
+// rectLight1.height = 51;
+// rectLight2.width = -51;
+// rectLight2.height = -51;
 // // console.log(rectLight1);
 // // const rectLight2 = new THREE.RectAreaLight('blue', 1, 5, 5);
 // scene.add(rectLight1, rectLight2);
@@ -454,50 +288,56 @@ scene.add(pointLightHelper);
 // }
 
 // // Tip 20
-// const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5)
+const cubeGeometry = new THREE.SphereGeometry(0.2, 32, 32);
 
-// for(let i = 0; i < 50; i++)
-// {
-//     const material = new THREE.MeshNormalMaterial()
+for (let i = 0; i < 50; i++) {
+  const material = new THREE.PointsMaterial({
+    size: 0.005,
+    color: '#CCFFFF',
+    // sizeAttenuation: true,
+  });
 
-//     const mesh = new THREE.Mesh(geometry, material)
-//     mesh.position.x = (Math.random() - 0.5) * 10
-//     mesh.position.y = (Math.random() - 0.5) * 10
-//     mesh.position.z = (Math.random() - 0.5) * 10
-//     mesh.rotation.x = (Math.random() - 0.5) * Math.PI * 2
-//     mesh.rotation.y = (Math.random() - 0.5) * Math.PI * 2
+  const mesh = new THREE.Points(cubeGeometry, material);
+  mesh.position.x = (Math.random() - 0.5) * 10;
+  mesh.position.y = (Math.random() - 0.5) * 10;
+  mesh.position.z = (Math.random() - 0.5) * 10;
+  mesh.rotation.x = (Math.random() - 0.5) * Math.PI * 2;
+  mesh.rotation.y = (Math.random() - 0.5) * Math.PI * 2;
 
-//     scene.add(mesh)
-// }
-
-// Tip 22 -- Create multiple box geometries with random rotations and positions with one draw call
-const cubeGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-
-const cubeMaterial = new THREE.MeshBasicMaterial();
-
-const mesh = new THREE.InstancedMesh(cubeGeometry, cubeMaterial, 400);
-// Add this for better performance
-mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-
-scene.add(mesh);
-
-for (let i = 0; i < 100; i++) {
-  // Create position
-  const position = new THREE.Vector3(
-    (Math.random() - 0.5) * 10,
-    (Math.random() - 0.5) * 10,
-    (Math.random() - 0.5) * 10
-  );
-
-  // Rotation
-  const quarternion = new THREE.Quaternion();
-  quarternion.setFromEuler(new THREE.Euler(0, 0, 0));
-  // Create matrxies
-  const matrix = new THREE.Matrix4();
-  matrix.makeRotationFromQuaternion(quarternion);
-  matrix.setPosition(position);
-  mesh.setMatrixAt(i, matrix);
+  scene.add(mesh);
 }
+
+// // Tip 22 -- Create multiple box geometries with random rotations and positions with one draw call
+// const cubeGeometry = new THREE.SphereGeometry(0.1, 32, 32);
+
+// const cubeMaterial = new THREE.PointsMaterial({
+//   size: 0.2,
+//   sizeAttenuation: true,
+// });
+
+// const mesh = new THREE.InstancedMesh(cubeGeometry, cubeMaterial, 400);
+// // Add this for better performance
+// mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+
+// scene.add(mesh);
+
+// for (let i = 0; i < 100; i++) {
+//   // Create position
+//   const position = new THREE.Vector3(
+//     (Math.random() - 0.5) * 10,
+//     (Math.random() - 0.5) * 10,
+//     (Math.random() - 0.5) * 10
+//   );
+
+//   // Rotation
+//   const quarternion = new THREE.Quaternion();
+//   quarternion.setFromEuler(new THREE.Euler(0, 0, 0));
+//   // Create matrxies
+//   const matrix = new THREE.Matrix4();
+//   matrix.makeRotationFromQuaternion(quarternion);
+//   matrix.setPosition(position);
+//   mesh.setMatrixAt(i, matrix);
+// }
 
 // // Tip 29
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -505,45 +345,10 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 // // Tip 31, 32, 34 and 35
 const shaderGeometry = new THREE.BoxGeometry(15, 15, 15, 25, 25, 25);
 
-const shaderMaterial = new THREE.ShaderMaterial({
-  // Creates better performance
-  precision: 'lowp',
+const shaderMaterial = new THREE.RawShaderMaterial({
+  vertexShader: testVertexShader,
+  fragmentShader: testFragmentShader,
   wireframe: true,
-  uniforms: {
-    uDisplacementTexture: { value: displacementTexture },
-  },
-  defines: {
-    DISPLACEMENT_STRENGTH: 4.5,
-  },
-  vertexShader: `
-        uniform sampler2D uDisplacementTexture;
-
-        varying vec3 vColor;
-
-        void main()
-        {
-          // Position
-          vec4 modelPosition = modelMatrix * vec4(position, 0.5);
-          float elevation = texture2D(uDisplacementTexture, uv).r;
-          modelPosition.y += max(elevation, 0.0) * DISPLACEMENT_STRENGTH;
-          gl_Position = projectionMatrix * viewMatrix * modelPosition;
-
-          // Color
-          float colorElevation = max(elevation, 0.5);
-          vec3 color = mix(vec3(1.0, 1.0, 1.0), vec3(0.05, 0.05, 0.05), colorElevation);
-
-          // Varying
-          vColor = color;
-        }
-    `,
-  fragmentShader: `
-        varying vec3 vColor;
-
-        void main()
-        {
-            gl_FragColor = vec4(vColor, 1.0);
-        }
-    `,
 });
 
 const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial);
