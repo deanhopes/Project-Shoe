@@ -80,12 +80,12 @@ window.addEventListener('resize', () => {
 
 // Base camera
 const camera = new THREE.PerspectiveCamera(
-  125,
+  105,
   sizes.width / sizes.height,
   0.1,
   100
 );
-camera.position.set(0, -5, 6.43);
+camera.position.set(-15, -15, 6);
 scene.add(camera);
 
 // gui.add(camera.position, 'x').min(-10).max(10).step(0.01).name('Camera X');
@@ -95,30 +95,35 @@ gui.add(camera.position, 'z').min(-10).max(10).step(0.01).name('Camera Z');
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.autoRotate = true;
+// controls.autoRotate = true;
 gui.add(controls, 'autoRotate').name('Auto Rotate');
 
 /**
  * Objects
  */
 
-const cubeGeometry = new THREE.SphereGeometry(0.2, 32, 32);
+const cubeGeometry = new THREE.SphereGeometry(1.5, 32, 32);
 
-const pointSpheres = () => {
-  for (let i = 0; i < 50; i++) {
-    const material = new THREE.MeshNormalMaterial();
+for (let i = 0; i < 50; i++) {
+  const material = new THREE.MeshNormalMaterial();
 
-    const mesh = new THREE.Points(cubeGeometry, material);
-    mesh.position.x = (Math.random() - 0.5) * 10;
-    mesh.position.y = (Math.random() - 0.5) * 10;
-    mesh.position.z = (Math.random() - 0.5) * 10;
-    mesh.rotation.x = (Math.random() - 0.5) * 10;
-    mesh.rotation.y = (Math.random() - 0.5) * Math.PI * 2;
+  const mesh = new THREE.Points(cubeGeometry, material);
+  mesh.position.x = (Math.random() - 0.5) * 10;
+  mesh.position.y = (Math.random() - 0.5) * 10;
+  mesh.position.z = (Math.random() - 0.5) * 10;
+  mesh.rotation.x = (Math.random() - 0.5) * 10;
+  mesh.rotation.y = (Math.random() - 0.5) * Math.PI * 2;
 
-    scene.add(mesh);
-  }
-};
-pointSpheres();
+  scene.add(mesh);
+}
+
+const advertCubeTexture = new THREE.TextureLoader().load(
+  '/textures/Frame 1.png'
+);
+const advertMaterial = new THREE.MeshBasicMaterial({ map: advertCubeTexture });
+const advertGeometry = new THREE.BoxGeometry(6, 10, 1);
+const advertMesh = new THREE.Mesh(advertGeometry, advertMaterial);
+scene.add(advertMesh);
 
 /**
  * Font Loader
@@ -126,11 +131,11 @@ pointSpheres();
 
 // Function for a name generator
 const fontLoader = new THREE.FontLoader();
-for (let i = 0; i < 25; i++) {
+for (let i = 0; i < 100; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('shiney', {
+    const textGeometry = new THREE.TextGeometry('all aboard', {
       font: font,
-      size: (Math.random() - 0.5) * 2,
+      size: (Math.random() - 0.5) * 0.5,
       height: Math.random() * 0.1,
       curveSegments: 24,
       bevelEnabled: true,
@@ -206,8 +211,8 @@ const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
   // Update Camera
-  camera.position.x = cursor.x * 3;
-  camera.position.y = cursor.y * 3;
+  camera.position.x = cursor.x * 10;
+  camera.position.y = 0.2 - cursor.y * 3;
 
   // sphere.parameters.radius = debugObject.radius;
   // sphere.geometry.position debugObject.radius
