@@ -88,8 +88,8 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(0, -5, 6.43);
 scene.add(camera);
 
-gui.add(camera.position, 'x').min(-10).max(10).step(0.01).name('Camera X');
-gui.add(camera.position, 'y').min(-10).max(10).step(0.01).name('Camera Y');
+// gui.add(camera.position, 'x').min(-10).max(10).step(0.01).name('Camera X');
+// gui.add(camera.position, 'y').min(-10).max(10).step(0.01).name('Camera Y');
 gui.add(camera.position, 'z').min(-10).max(10).step(0.01).name('Camera Z');
 
 // Controls
