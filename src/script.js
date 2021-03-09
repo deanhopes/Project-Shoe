@@ -78,6 +78,7 @@ const camera = new THREE.PerspectiveCamera(
   100
 );
 camera.position.set(0, -5, -5);
+camera.rotation.set(150, 0, 0);
 // camera.rotation.x = 5;
 scene.add(camera);
 
@@ -117,18 +118,11 @@ line.material.opacity = 1.0;
 line.material.transparent = false;
 
 // Inner Sphere
-const material = new THREE.PointsMaterial({
-  size: 0.02,
-  sizeAttenuation: true,
-});
-
+const material = new THREE.MeshToonMaterial();
 material.flatShading = true;
-const sphere = new THREE.Mesh(
-  new THREE.SphereGeometry(debugObject.radius, 64, 64),
-  material
-);
+const sphere = new THREE.Mesh(new THREE.BoxGeometry(64, 64, 64), material);
 // Add the wireframe and sphere
-scene.add(sphere);
+scene.add(sphere, line);
 
 // Add a d3bug object that
 gui.add(debugObject, 'radius').min(0).max(16);
