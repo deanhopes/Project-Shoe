@@ -85,7 +85,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   100
 );
-camera.position.set(-15, -15, 6);
+camera.position.set(-15, -15, 10);
 scene.add(camera);
 
 // gui.add(camera.position, 'x').min(-10).max(10).step(0.01).name('Camera X');
@@ -121,9 +121,9 @@ const advertCubeTexture = new THREE.TextureLoader().load(
   '/textures/Frame 1.png'
 );
 const advertMaterial = new THREE.MeshBasicMaterial({ map: advertCubeTexture });
-const advertGeometry = new THREE.BoxGeometry(6, 10, 1);
+const advertGeometry = new THREE.BoxGeometry(6, 8, 1);
 const advertMesh = new THREE.Mesh(advertGeometry, advertMaterial);
-// scene.add(advertMesh);
+scene.add(advertMesh);
 
 /**
  * Font Loader
@@ -131,11 +131,11 @@ const advertMesh = new THREE.Mesh(advertGeometry, advertMaterial);
 
 // Function for a name generator
 const fontLoader = new THREE.FontLoader();
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 25; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('shiney', {
+    const textGeometry = new THREE.TextGeometry('all aboard', {
       font: font,
-      size: (Math.random() - 0.5) * 2,
+      size: (Math.random() - 0.5) * 1,
       height: Math.random() * 0.1,
       curveSegments: 24,
       bevelEnabled: true,
@@ -152,6 +152,81 @@ for (let i = 0; i < 100; i++) {
     text.position.y = (Math.random() - 0.5) * 15;
     text.position.x = (Math.random() - 0.5) * 15;
     text.position.z = (Math.random() - 0.5) * 15;
+    text.lookAt(camera.position);
+    scene.add(text);
+  });
+}
+for (let i = 0; i < 25; i++) {
+  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
+    const textGeometry = new THREE.TextGeometry('see u in the next lesson', {
+      font: font,
+      size: (Math.random() - 0.5) * 0.5,
+      height: Math.random() * 0.1,
+      curveSegments: 24,
+      bevelEnabled: true,
+      bevelThickness: 0.5,
+      bevelSize: 0.02,
+      bevelOffset: 0,
+      bevelSegments: 2,
+      // castShadow: true,
+    });
+    const textMaterial = new THREE.MeshNormalMaterial();
+    textMaterial.flatShading = false;
+    textMaterial.displacementBias = 10.5;
+    const text = new THREE.Mesh(textGeometry, textMaterial);
+    text.position.y = (Math.random() - 0.5) * 15;
+    text.position.x = (Math.random() - 0.5) * 15;
+    text.position.z = (Math.random() - 0.5) * 15;
+    text.lookAt(camera.position);
+    scene.add(text);
+  });
+}
+for (let i = 0; i < 25; i++) {
+  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
+    const textGeometry = new THREE.TextGeometry('cool', {
+      font: font,
+      size: (Math.random() - 0.5) * 0.5,
+      height: Math.random() * 0.1,
+      curveSegments: 24,
+      bevelEnabled: true,
+      bevelThickness: 0.5,
+      bevelSize: 0.02,
+      bevelOffset: 0,
+      bevelSegments: 2,
+      // castShadow: true,
+    });
+    const textMaterial = new THREE.MeshNormalMaterial();
+    textMaterial.flatShading = false;
+    textMaterial.displacementBias = 10.5;
+    const text = new THREE.Mesh(textGeometry, textMaterial);
+    text.position.y = (Math.random() - 0.5) * 15;
+    text.position.x = (Math.random() - 0.5) * 15;
+    text.position.z = (Math.random() - 0.5) * 15;
+    text.lookAt(camera.position);
+    scene.add(text);
+  });
+}
+for (let i = 0; i < 25; i++) {
+  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
+    const textGeometry = new THREE.TextGeometry('woof', {
+      font: font,
+      size: (Math.random() - 0.5) * 1,
+      height: Math.random() * 0.1,
+      curveSegments: 24,
+      bevelEnabled: true,
+      bevelThickness: 0.5,
+      bevelSize: 0.02,
+      bevelOffset: 0,
+      bevelSegments: 2,
+      // castShadow: true,
+    });
+    const textMaterial = new THREE.MeshNormalMaterial();
+    textMaterial.flatShading = false;
+    textMaterial.displacementBias = 10.5;
+    const text = new THREE.Mesh(textGeometry, textMaterial);
+    text.position.y = (Math.random() - 0.5) * 35;
+    text.position.x = (Math.random() - 0.5) * 35;
+    text.position.z = (Math.random() - 0.5) * 35;
     text.lookAt(camera.position);
     scene.add(text);
   });
@@ -185,9 +260,9 @@ const shaderMaterial = new THREE.RawShaderMaterial({
 });
 
 const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial);
-shaderMesh.rotation.x = Math.sin(Math.PI) * 10;
-shaderMesh.rotation.y = Math.sin(Math.PI) * 10;
-shaderMesh.rotation.z = Math.sin(Math.PI) * 10;
+// shaderMesh.rotation.x = Math.sin(Math.PI) * 5;
+// shaderMesh.rotation.y = Math.sin(Math.PI) * 5;
+// shaderMesh.rotation.z = Math.sin(Math.PI) * 5;
 scene.add(shaderMesh);
 
 /**
