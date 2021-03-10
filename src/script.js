@@ -123,7 +123,7 @@ const advertCubeTexture = new THREE.TextureLoader().load(
 const advertMaterial = new THREE.MeshBasicMaterial({ map: advertCubeTexture });
 const advertGeometry = new THREE.BoxGeometry(6, 10, 1);
 const advertMesh = new THREE.Mesh(advertGeometry, advertMaterial);
-scene.add(advertMesh);
+// scene.add(advertMesh);
 
 /**
  * Font Loader
@@ -133,9 +133,9 @@ scene.add(advertMesh);
 const fontLoader = new THREE.FontLoader();
 for (let i = 0; i < 100; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('all aboard', {
+    const textGeometry = new THREE.TextGeometry('shiney', {
       font: font,
-      size: (Math.random() - 0.5) * 0.5,
+      size: (Math.random() - 0.5) * 2,
       height: Math.random() * 0.1,
       curveSegments: 24,
       bevelEnabled: true,
