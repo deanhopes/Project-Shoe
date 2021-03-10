@@ -1,4 +1,8 @@
-  void main()
-  {
-   gl_FragColor = vec4(0.3, 0.3, 0.5, 1.0);
-  }
+precision mediump float;
+
+
+varying float vRandom;
+void main()
+{
+gl_FragColor = vec4(0.0, 0.0, vRandom, 1.0);
+}
