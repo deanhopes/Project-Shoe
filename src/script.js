@@ -136,7 +136,7 @@ camera.lookAt(pupil.position);
 // Function for a name generator
 const fontLoader = new THREE.FontLoader();
 fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-  const textGeometry = new THREE.TextGeometry('jour neuf', {
+  const textGeometry = new THREE.TextGeometry('Day 09', {
     font: font,
     size: 10,
     height: 1,
@@ -153,7 +153,7 @@ fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
   // textMaterial.displacementBias = 10.5;
   const text = new THREE.Mesh(textGeometry, textMaterial);
   text.position.y = -30;
-  text.position.x = -26;
+  text.position.x = -22;
   text.position.z = 25;
   // text.lookAt(camera.position);
   scene.add(text);
