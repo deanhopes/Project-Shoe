@@ -86,7 +86,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   200
 );
-camera.position.set(-13.7, 3.64, 64.34);
+camera.position.set(-22.37, 14.48, 79.51);
 scene.add(camera);
 
 gui.add(camera.position, 'x').min(-100).max(100).step(0.01).name('Camera X');
@@ -162,16 +162,16 @@ const textArray = [];
 const fontLoader = new THREE.FontLoader();
 for (let i = 0; i < 15; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('Focus', {
+    const textGeometry = new THREE.TextGeometry('focus', {
       font: font,
       size: Math.random() * 5,
-      height: Math.random() * 2,
-      curveSegments: 36,
+      height: Math.random() * 10,
+      curveSegments: 128,
       bevelEnabled: true,
       bevelThickness: 0.5,
-      bevelSize: 0.4,
-      bevelOffset: 0.2,
-      bevelSegments: 5,
+      bevelSize: 0.2,
+      bevelOffset: 0.1,
+      bevelSegments: 10,
       // castShadow: true,
     });
     const textMaterial = new THREE.MeshStandardMaterial({
@@ -181,7 +181,7 @@ for (let i = 0; i < 15; i++) {
       metalness: 0.5,
       flatShading: true,
     });
-    textMaterial.flatShading = false;
+    // textMaterial.flatShading = false;
     // textMaterial.displacementBias = 10.5;
     const text = new THREE.Mesh(textGeometry, textMaterial);
     text.position.y = (Math.random() - 0.5) * 75;
@@ -288,7 +288,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 // const pointLight1 = new THREE.PointLight('blue', 1.0);
 // const pointLight2 = new THREE.PointLight('green', 1.0);
 // scene.add(pointLight, pointLight1, pointLight2);
-const directionalLight = new THREE.PointLight('red', 1.0);
+const directionalLight = new THREE.PointLight('red', 1.5);
 directionalLight.position.set(50, 50, 250);
 scene.add(directionalLight);
 
@@ -306,7 +306,7 @@ const tick = () => {
   textArray.forEach((text) => {
     text.rotation.x = Math.sin(elapsedTime);
     text.rotation.y = Math.sin(elapsedTime);
-    text.rotation.z = Math.sin(elapsedTime);
+    text.rotation.z = Math.cos(elapsedTime);
   });
 
   // Update controls
