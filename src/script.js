@@ -119,13 +119,22 @@ gui.add(controls, 'autoRotate').name('Auto Rotate');
  * Banner Ad
  */
 const bannerCubeTexture = new THREE.TextureLoader().load(
-  '/textures/Frame 2.png'
+  '/textures/Frame 1.jpg'
 );
 const bannerMaterial = new THREE.MeshBasicMaterial({ map: bannerCubeTexture });
 const bannerGeometry = new THREE.BoxGeometry(5, 2, 0.1);
 const bannerMesh = new THREE.Mesh(bannerGeometry, bannerMaterial);
 bannerMesh.position.y = 6;
 scene.add(bannerMesh);
+
+const buttonCubeTexture = new THREE.TextureLoader().load(
+  '/textures/Frame 3.jpg'
+);
+const buttonMaterial = new THREE.MeshBasicMaterial({ map: buttonCubeTexture });
+const buttonGeometry = new THREE.BoxGeometry(6, 2, 0.1);
+const buttonMesh = new THREE.Mesh(buttonGeometry, buttonMaterial);
+buttonMesh.position.y = -6;
+scene.add(buttonMesh);
 
 /**
  * Advert
@@ -149,7 +158,7 @@ for (let i = 0; i < 25; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
     const textGeometry = new THREE.TextGeometry('all aboard', {
       font: font,
-      size: (Math.random() - 0.5) * 0.4,
+      size: (Math.random() - 0.5) * 0.6,
       height: Math.random(),
       curveSegments: 24,
       bevelEnabled: true,
@@ -174,7 +183,7 @@ for (let i = 0; i < 25; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
     const textGeometry = new THREE.TextGeometry('see u in the next lesson', {
       font: font,
-      size: (Math.random() - 0.5) * 0.4,
+      size: (Math.random() - 0.5) * 0.6,
       height: Math.random() * 0.1,
       curveSegments: 24,
       bevelEnabled: true,
@@ -199,7 +208,7 @@ for (let i = 0; i < 25; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
     const textGeometry = new THREE.TextGeometry('cool t-shirt', {
       font: font,
-      size: (Math.random() - 0.5) * 0.4,
+      size: (Math.random() - 0.5) * 0.6,
       height: Math.random() * 0.1,
       curveSegments: 24,
       bevelEnabled: true,
@@ -224,7 +233,7 @@ for (let i = 0; i < 25; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
     const textGeometry = new THREE.TextGeometry('woof', {
       font: font,
-      size: (Math.random() - 0.5) * 0.4,
+      size: (Math.random() - 0.5) * 0.6,
       height: Math.random() * 0.1,
       curveSegments: 24,
       bevelEnabled: true,
