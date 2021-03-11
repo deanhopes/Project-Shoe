@@ -3,11 +3,8 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import Stats from 'stats.js';
 import { GUI } from 'dat.gui';
-import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js';
 import testVertexShader from '/shaders/test/vertex.vs.glsl';
 import testFragmentShader from '/shaders/test/fragment.fs.glsl';
-import { CubeTexture } from 'three';
-// import CANNON from 'cannon';
 
 // Link to the host site: https://naughty-dubinsky-b1df58.netlify.app/
 
@@ -23,12 +20,17 @@ document.body.appendChild(stats.dom);
  */
 const debugObject = {};
 
+/**
+ * Cursor
+ */
+
 const cursor = { x: 0, y: 0 };
 
 window.addEventListener('mousemove', (e) => {
   cursor.x = e.clientX / sizes.width - 0.5;
   cursor.y = -(e.clientY / sizes.height) - 0.5;
 });
+
 /**
  * Base
  */
@@ -79,17 +81,17 @@ window.addEventListener('resize', () => {
 
 // Base camera
 const camera = new THREE.PerspectiveCamera(
-  125,
+  75,
   sizes.width / sizes.height,
   0.1,
   100
 );
-camera.position.set(-15, -15, 10);
+camera.position.set(0, 0, 100);
 scene.add(camera);
 
-// gui.add(camera.position, 'x').min(-10).max(10).step(0.01).name('Camera X');
-// gui.add(camera.position, 'y').min(-10).max(10).step(0.01).name('Camera Y');
-gui.add(camera.position, 'z').min(-10).max(10).step(0.01).name('Camera Z');
+gui.add(camera.position, 'x').min(-100).max(100).step(0.01).name('Camera X');
+gui.add(camera.position, 'y').min(-100).max(100).step(0.01).name('Camera Y');
+gui.add(camera.position, 'z').min(-100).max(100).step(0.01).name('Camera Z');
 
 // Controls
 const controls = new OrbitControls(camera, canvas);
@@ -101,52 +103,31 @@ gui.add(controls, 'autoRotate').name('Auto Rotate');
  * Objects
  */
 
-// const cubeGeometry = new THREE.BoxGeometry(5, 32, 32);
-// for (let i = 0; i < 5; i++) {
-//   const material = new THREE.MeshNormalMaterial();
+const whiteOfEyeGeo = new THREE.SphereGeometry(20, 64, 64);
+const whiteOfEyeMat = new THREE.MeshBasicMaterial();
+const whiteOfEye = new THREE.Mesh(whiteOfEyeGeo, whiteOfEyeMat);
+scene.add(whiteOfEye);
 
-//   const mesh = new THREE.Points(cubeGeometry, material);
-//   mesh.position.x = (Math.random() - 0.5) * 10;
-//   mesh.position.y = (Math.random() - 0.5) * 10;
-//   mesh.position.z = (Math.random() - 0.5) * 10;
-//   mesh.rotation.x = (Math.random() - 0.5) * 10;
-//   mesh.rotation.y = (Math.random() - 0.5) * Math.PI * 2;
+debugObject.torusRadius = 15.5;
 
-//   scene.add(mesh);
-// }
+const torusGeo = new THREE.TorusGeometry(7, 2.5, 4, 45, 6.3);
+const torusMat = new THREE.MeshNormalMaterial();
+const torus = new THREE.Mesh(torusGeo, torusMat);
+torus.position.z = 20;
+scene.add(torus);
+gui
+  .add(debugObject, 'torusRadius')
+  .min(0)
+  .max(50)
+  .step(0.01)
+  .name('Torus Radius');
 
-/**
- * Banner Ad
- */
-const bannerCubeTexture = new THREE.TextureLoader().load(
-  '/textures/Frame 1.jpg'
-);
-const bannerMaterial = new THREE.MeshBasicMaterial({ map: bannerCubeTexture });
-const bannerGeometry = new THREE.BoxGeometry(5, 2, 0.1);
-const bannerMesh = new THREE.Mesh(bannerGeometry, bannerMaterial);
-bannerMesh.position.y = 6;
-scene.add(bannerMesh);
-
-const buttonCubeTexture = new THREE.TextureLoader().load(
-  '/textures/Frame 3.jpg'
-);
-const buttonMaterial = new THREE.MeshBasicMaterial({ map: buttonCubeTexture });
-const buttonGeometry = new THREE.BoxGeometry(6, 2, 0.1);
-const buttonMesh = new THREE.Mesh(buttonGeometry, buttonMaterial);
-buttonMesh.position.y = -6;
-scene.add(buttonMesh);
-
-/**
- * Advert
- */
-
-const advertCubeTexture = new THREE.TextureLoader().load(
-  '/textures/Frame 1.png'
-);
-const advertMaterial = new THREE.MeshBasicMaterial({ map: advertCubeTexture });
-const advertGeometry = new THREE.BoxGeometry(6, 8, 1);
-const advertMesh = new THREE.Mesh(advertGeometry, advertMaterial);
-scene.add(advertMesh);
+const pupilGeo = new THREE.SphereGeometry(5, 64, 64);
+const pupilMat = new THREE.MeshBasicMaterial({ color: '#000' });
+const pupil = new THREE.Mesh(pupilGeo, pupilMat);
+pupil.position.z = 20;
+scene.add(pupil);
+camera.lookAt(pupil.position);
 
 /**
  * Font Loader
@@ -154,106 +135,55 @@ scene.add(advertMesh);
 
 // Function for a name generator
 const fontLoader = new THREE.FontLoader();
-for (let i = 0; i < 25; i++) {
-  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('all aboard', {
-      font: font,
-      size: (Math.random() - 0.5) * 0.6,
-      height: Math.random(),
-      curveSegments: 24,
-      bevelEnabled: true,
-      bevelThickness: 0.5,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      bevelSegments: 2,
-      // castShadow: true,
-    });
-    const textMaterial = new THREE.MeshNormalMaterial();
-    textMaterial.flatShading = false;
-    // textMaterial.displacementBias = 10.5;
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 35;
-    text.position.x = (Math.random() - 0.5) * 35;
-    text.position.z = (Math.random() - 0.5) * 35;
-    // text.lookAt(camera.position);
-    scene.add(text);
+fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
+  const textGeometry = new THREE.TextGeometry('jour neuf', {
+    font: font,
+    size: 10,
+    height: 1,
+    curveSegments: 24,
+    bevelEnabled: true,
+    bevelThickness: 0.5,
+    bevelSize: 0.02,
+    bevelOffset: 0,
+    bevelSegments: 2,
+    // castShadow: true,
   });
-}
-for (let i = 0; i < 25; i++) {
-  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('see u in the next lesson', {
-      font: font,
-      size: (Math.random() - 0.5) * 0.6,
-      height: Math.random() * 0.1,
-      curveSegments: 24,
-      bevelEnabled: true,
-      bevelThickness: 0.5,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      bevelSegments: 2,
-      // castShadow: true,
-    });
-    const textMaterial = new THREE.MeshNormalMaterial();
-    textMaterial.flatShading = false;
-    textMaterial.displacementBias = 10.5;
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 35;
-    text.position.x = (Math.random() - 0.5) * 35;
-    text.position.z = (Math.random() - 0.5) * 35;
-    // text.lookAt(camera.position);
-    scene.add(text);
-  });
-}
-for (let i = 0; i < 25; i++) {
-  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('cool t-shirt', {
-      font: font,
-      size: (Math.random() - 0.5) * 0.6,
-      height: Math.random() * 0.1,
-      curveSegments: 24,
-      bevelEnabled: true,
-      bevelThickness: 0.5,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      bevelSegments: 2,
-      // castShadow: true,
-    });
-    const textMaterial = new THREE.MeshNormalMaterial();
-    textMaterial.flatShading = false;
-    textMaterial.displacementBias = 10.5;
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 35;
-    text.position.x = (Math.random() - 0.5) * 35;
-    text.position.z = (Math.random() - 0.5) * 35;
-    // text.lookAt(camera.position);
-    scene.add(text);
-  });
-}
-for (let i = 0; i < 25; i++) {
-  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('woof', {
-      font: font,
-      size: (Math.random() - 0.5) * 0.6,
-      height: Math.random() * 0.1,
-      curveSegments: 24,
-      bevelEnabled: true,
-      bevelThickness: 0.5,
-      bevelSize: 0.02,
-      bevelOffset: 0,
-      bevelSegments: 2,
-      // castShadow: true,
-    });
-    const textMaterial = new THREE.MeshNormalMaterial();
-    textMaterial.flatShading = false;
-    textMaterial.displacementBias = 10.5;
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 35;
-    text.position.x = (Math.random() - 0.5) * 35;
-    text.position.z = (Math.random() - 0.5) * 35;
-    // text.lookAt(camera.position);
-    scene.add(text);
-  });
-}
+  const textMaterial = new THREE.MeshStandardMaterial({ color: 'white' });
+  textMaterial.flatShading = false;
+  // textMaterial.displacementBias = 10.5;
+  const text = new THREE.Mesh(textGeometry, textMaterial);
+  text.position.y = -30;
+  text.position.x = -26;
+  text.position.z = 25;
+  // text.lookAt(camera.position);
+  scene.add(text);
+});
+
+// for (let i = 0; i < 15; i++) {
+//   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
+//     const textGeometry = new THREE.TextGeometry('jour neuf', {
+//       font: font,
+//       size: Math.random() * 5,
+//       height: Math.random() * 15,
+//       curveSegments: 24,
+//       bevelEnabled: true,
+//       bevelThickness: 0.5,
+//       bevelSize: 0.02,
+//       bevelOffset: 0,
+//       bevelSegments: 2,
+//       // castShadow: true,
+//     });
+//     const textMaterial = new THREE.MeshStandardMaterial({ color: 'blue' });
+//     textMaterial.flatShading = false;
+//     // textMaterial.displacementBias = 10.5;
+//     const text = new THREE.Mesh(textGeometry, textMaterial);
+//     text.position.y = (Math.random() - 0.5) * 100;
+//     text.position.x = (Math.random() - 0.5) * 100;
+//     text.position.z = (Math.random() - 0.5) * 100;
+//     // text.lookAt(camera.position);
+//     scene.add(text);
+//   });
+// }
 
 /**
  * Renderer
@@ -273,40 +203,49 @@ renderer.setPixelRatio(window.devicePixelRatio);
 // // Tip 29
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// Color of Shader
-debugObject.depthColor = '#25258c';
-debugObject.surfaceColor = '#acfff5';
+// // Color of Shader
+// debugObject.depthColor = '#25258c';
+// debugObject.surfaceColor = '#acfff5';
 
-// // Tip 31, 32, 34 and 35
-const shaderGeometry = new THREE.BoxGeometry(15, 15, 15, 25, 25, 25);
+// // Shader
+// const shaderGeometry = new THREE.BoxGeometry(15, 15, 15, 25, 25, 25);
 
-const shaderMaterial = new THREE.RawShaderMaterial({
-  vertexShader: testVertexShader,
-  fragmentShader: testFragmentShader,
-  wireframe: true,
-  uniforms: {
-    // Time
-    uTime: { value: 0 },
+// const shaderMaterial = new THREE.RawShaderMaterial({
+//   vertexShader: testVertexShader,
+//   fragmentShader: testFragmentShader,
+//   wireframe: true,
+//   uniforms: {
+//     // Time
+//     uTime: { value: 0 },
 
-    // Color
-    uDepthColor: { value: new THREE.Color(debugObject.depthColor) },
-    uSurfaceColor: { value: new THREE.Color(debugObject.surfaceColor) },
-    uColorOffset: { value: 0.5 },
-    uColorMultiplier: { value: 5 },
+//     // Color
+//     uDepthColor: { value: new THREE.Color(debugObject.depthColor) },
+//     uSurfaceColor: { value: new THREE.Color(debugObject.surfaceColor) },
+//     uColorOffset: { value: 0.1 },
+//     uColorMultiplier: { value: 5 },
 
-    // Textures
-    // uTextures: { value: advertCubeTexture },
+//     // Textures
+//     // uTextures: { value: advertCubeTexture },
 
-    // Frequency
-    uFrequency: { value: new THREE.Vector2(10, 5) },
-  },
-});
+//     // Frequency
+//     uFrequency: { value: new THREE.Vector2(10, 5) },
+//   },
+// });
 
-const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial);
-// shaderMesh.rotation.x = Math.sin(Math.PI) * 5;
-// shaderMesh.rotation.y = Math.sin(Math.PI) * 5;
-// shaderMesh.rotation.z = Math.sin(Math.PI) * 5;
-scene.add(shaderMesh);
+// const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial);
+// // shaderMesh.rotation.x = Math.sin(Math.PI) * 5;
+// // shaderMesh.rotation.y = Math.sin(Math.PI) * 5;
+// // shaderMesh.rotation.z = Math.sin(Math.PI) * 5;
+// scene.add(shaderMesh);
+
+// Randomises the points
+
+// const count = shaderGeometry.attributes.position.count;
+// const randoms = new Float32Array(count);
+// for (let i = 0; i < count; i++) {
+//   randoms[i] = Math.random() * 1;
+// }
+// shaderGeometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1));
 
 /**
  * Lights
@@ -316,19 +255,9 @@ scene.add(shaderMesh);
 // const pointLight1 = new THREE.PointLight('blue', 1.0);
 // const pointLight2 = new THREE.PointLight('green', 1.0);
 // scene.add(pointLight, pointLight1, pointLight2);
-const directionalLight = new THREE.PointLight('white', 1);
+const directionalLight = new THREE.PointLight('white', 1.2);
+directionalLight.position.set(0, 50, 150);
 scene.add(directionalLight);
-
-/**
- *
- */
-
-const count = shaderGeometry.attributes.position.count;
-const randoms = new Float32Array(count);
-for (let i = 0; i < count; i++) {
-  randoms[i] = Math.random() * 1;
-}
-shaderGeometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1));
 
 /**
  * Animation
@@ -341,14 +270,9 @@ const tick = () => {
 
   const elapsedTime = clock.getElapsedTime();
 
-  // Update Camera
-  camera.position.x = cursor.x * 10;
-  camera.position.y = 0.3 - cursor.y * 3;
-
-  bannerMesh.position.x = Math.sin(elapsedTime) * 0.1;
-
-  // sphere.parameters.radius = debugObject.radius;
-  // sphere.geometry.position debugObject.radius
+  // camera.position.x = cursor.x * 50;
+  // camera.position.y = cursor.y * 50;
+  // camera.lookAt(pupil.position);
 
   // Update controls
   controls.update();
