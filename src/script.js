@@ -117,7 +117,13 @@ scene.add(whiteOfEye);
 debugObject.torusRadius = 15.5;
 
 const torusGeo = new THREE.TorusGeometry(5, 4, 4, 45, 6.3);
-const torusMat = new THREE.MeshNormalMaterial({ flatShading: true });
+const torusMat = new THREE.MeshStandardMaterial({
+  color: 'white',
+  emissive: '#0000ff',
+  roughness: 0.6,
+  metalness: 0.7,
+  flatShading: true,
+});
 const torus = new THREE.Mesh(torusGeo, torusMat);
 torus.position.z = 40;
 scene.add(torus);
