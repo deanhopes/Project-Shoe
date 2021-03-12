@@ -175,10 +175,10 @@ for (let i = 0; i < 10; i++) {
       // castShadow: true,
     });
     const textMaterial = new THREE.MeshStandardMaterial({
-      color: 'white',
-      emissive: '#0000ff',
+      color: 'black',
+      emissive: '#000000',
       roughness: 0.3,
-      metalness: 0.8,
+      metalness: 0.5,
       flatShading: true,
     });
     // textMaterial.flatShading = false;
@@ -288,7 +288,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 // const pointLight1 = new THREE.PointLight('blue', 1.0);
 // const pointLight2 = new THREE.PointLight('green', 1.0);
 // scene.add(pointLight, pointLight1, pointLight2);
-const directionalLight = new THREE.PointLight('red', 1.5);
+const directionalLight = new THREE.DirectionalLight('white', 5.0);
 directionalLight.position.set(50, 50, 250);
 scene.add(directionalLight);
 
@@ -303,8 +303,11 @@ const tick = () => {
 
   const elapsedTime = clock.getElapsedTime();
 
-  textArray.forEach((text) => {
-    text.rotation.x = Math.abs(elapsedTime);
+  textArray.forEach((text, i) => {
+    // console.log(textArray[i]);
+    textArray[i].rotation.x =
+      (Math.random() - 0.5) * 1.0 * 500.0 * Math.sin(elapsedTime) * 0.1;
+    // console.log(i);
     // text.rotation.y = elapsedTime;
     // text.rotation.z = elapsedTime;
   });
