@@ -86,7 +86,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   200
 );
-camera.position.set(-22.37, 14.48, 79.51);
+camera.position.set(0, 0, 100);
 scene.add(camera);
 
 gui.add(camera.position, 'x').min(-100).max(100).step(0.01).name('Camera X');
@@ -160,11 +160,11 @@ const textArray = [];
 
 // Function for a name generator
 const fontLoader = new THREE.FontLoader();
-for (let i = 0; i < 15; i++) {
+for (let i = 0; i < 10; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
     const textGeometry = new THREE.TextGeometry('focus', {
       font: font,
-      size: Math.random() * 5,
+      size: Math.random() * 10,
       height: Math.random() * 10,
       curveSegments: 128,
       bevelEnabled: true,
@@ -178,7 +178,7 @@ for (let i = 0; i < 15; i++) {
       color: 'white',
       emissive: '#0000ff',
       roughness: 0.3,
-      metalness: 0.5,
+      metalness: 0.8,
       flatShading: true,
     });
     // textMaterial.flatShading = false;
@@ -304,9 +304,9 @@ const tick = () => {
   const elapsedTime = clock.getElapsedTime();
 
   textArray.forEach((text) => {
-    text.rotation.x = Math.sin(elapsedTime);
-    text.rotation.y = Math.sin(elapsedTime);
-    text.rotation.z = Math.cos(elapsedTime);
+    text.rotation.x = Math.abs(elapsedTime);
+    // text.rotation.y = elapsedTime;
+    // text.rotation.z = elapsedTime;
   });
 
   // Update controls
