@@ -41,8 +41,12 @@ const canvas = document.querySelector('canvas.webgl');
 const scene = new THREE.Scene();
 
 // GUI
-
 const gui = new GUI();
+
+// CCapture
+const recorder = new CCapture({
+  format: 'png',
+});
 
 /**
  * Textures
@@ -292,6 +296,34 @@ const directionalLight = new THREE.DirectionalLight('white', 5.0);
 directionalLight.position.set(50, 50, 250);
 scene.add(directionalLight);
 
+// Setup CCapture Buttons
+function setupButtons() {
+  const $start = document.getElementById('start');
+  const $stop = document.getElementById('stop');
+  $start.addEventListener(
+    'click',
+    (e) => {
+      e.preventDefault();
+      recorder.start();
+      $start.style.display = 'none';
+      $stop.style.display = 'block';
+    },
+    false
+  );
+
+  $stop.addEventListener(
+    'click',
+    (e) => {
+      e.preventDefault();
+      recorder.stop();
+      $stop.style.display = 'none';
+      recorder.save();
+    },
+    false
+  );
+}
+setupButtons();
+
 /**
  * Animation
  */
@@ -317,6 +349,8 @@ const tick = () => {
 
   // Render
   renderer.render(scene, camera);
+
+  recorder.capture(renderer.domElement);
 
   // Call tick again on the next frame
   window.requestAnimationFrame(tick);
