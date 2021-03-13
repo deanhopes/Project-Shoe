@@ -5,6 +5,7 @@ import Stats from 'stats.js';
 import { GUI } from 'dat.gui';
 import testVertexShader from '/shaders/test/vertex.vs.glsl';
 import testFragmentShader from '/shaders/test/fragment.fs.glsl';
+import CCapture from '../src/ccapture/CCapture';
 
 // Link to the host site: https://naughty-dubinsky-b1df58.netlify.app/
 
