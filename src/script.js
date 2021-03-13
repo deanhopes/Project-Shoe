@@ -8,6 +8,11 @@ import testFragmentShader from '/shaders/test/fragment.fs.glsl';
 
 // Link to the host site: https://naughty-dubinsky-b1df58.netlify.app/
 
+// CCapture
+const recorder = new CCapture({
+  format: 'png',
+});
+
 /**
  * Stats
  */
@@ -42,11 +47,6 @@ const scene = new THREE.Scene();
 
 // GUI
 const gui = new GUI();
-
-// CCapture
-const recorder = new CCapture({
-  format: 'png',
-});
 
 /**
  * Textures
