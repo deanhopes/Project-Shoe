@@ -165,9 +165,9 @@ const textArray = [];
 
 // Function for a name generator
 const fontLoader = new THREE.FontLoader();
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 50; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('focus', {
+    const textGeometry = new THREE.TextGeometry('?', {
       font: font,
       size: Math.random() * 10,
       height: Math.random() * 10,
@@ -338,7 +338,9 @@ const tick = () => {
 
   textArray.forEach((text, i) => {
     // console.log(textArray[i]);
-    textArray[i].rotation.x =
+    textArray[i].rotation.y =
+      (Math.random() - 0.5) * 1.0 * 500.0 * Math.sin(elapsedTime) * 0.1;
+    textArray[i].position.y =
       (Math.random() - 0.5) * 1.0 * 500.0 * Math.sin(elapsedTime) * 0.1;
     // console.log(i);
     // text.rotation.y = elapsedTime;
