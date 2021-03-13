@@ -165,26 +165,26 @@ const textArray = [];
 
 // Function for a name generator
 const fontLoader = new THREE.FontLoader();
-for (let i = 0; i < 50; i++) {
+for (let i = 0; i < 100; i++) {
   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
     const textGeometry = new THREE.TextGeometry('?', {
       font: font,
       size: Math.random() * 10,
       height: Math.random() * 10,
-      curveSegments: 128,
-      bevelEnabled: true,
-      bevelThickness: 0.5,
-      bevelSize: 0.2,
-      bevelOffset: 0.1,
-      bevelSegments: 10,
+      curveSegments: 8,
+      // bevelEnabled: true,
+      // bevelThickness: 0.5,
+      // bevelSize: 0.2,
+      // bevelOffset: 0.1,
+      // bevelSegments: 10,
       // castShadow: true,
     });
     const textMaterial = new THREE.MeshStandardMaterial({
       color: 'black',
       emissive: '#000000',
-      roughness: 0.3,
+      roughness: 0.2,
       metalness: 0.5,
-      flatShading: true,
+      // flatShading: true,
     });
     // textMaterial.flatShading = false;
     // textMaterial.displacementBias = 10.5;
@@ -241,40 +241,42 @@ renderer.setPixelRatio(window.devicePixelRatio);
 // // Tip 29
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// // Color of Shader
-// debugObject.depthColor = '#25258c';
-// debugObject.surfaceColor = '#acfff5';
+// Color of Shader
+debugObject.depthColor = '#25258c';
+debugObject.surfaceColor = '#acfff5';
 
-// // Shader
-// const shaderGeometry = new THREE.BoxGeometry(15, 15, 15, 25, 25, 25);
+// Shader
+const shaderGeometry = new THREE.SphereGeometry(15, 15, 15, 25, 25, 25);
 
-// const shaderMaterial = new THREE.RawShaderMaterial({
-//   vertexShader: testVertexShader,
-//   fragmentShader: testFragmentShader,
-//   wireframe: true,
-//   uniforms: {
-//     // Time
-//     uTime: { value: 0 },
+const shaderMaterial = new THREE.RawShaderMaterial({
+  vertexShader: testVertexShader,
+  fragmentShader: testFragmentShader,
+  wireframe: true,
+  linewidth: 5,
+  transparent: true,
+  uniforms: {
+    // Time
+    uTime: { value: 0 },
 
-//     // Color
-//     uDepthColor: { value: new THREE.Color(debugObject.depthColor) },
-//     uSurfaceColor: { value: new THREE.Color(debugObject.surfaceColor) },
-//     uColorOffset: { value: 0.1 },
-//     uColorMultiplier: { value: 5 },
+    // Color
+    uDepthColor: { value: new THREE.Color(debugObject.depthColor) },
+    uSurfaceColor: { value: new THREE.Color(debugObject.surfaceColor) },
+    uColorOffset: { value: 0.1 },
+    uColorMultiplier: { value: 15 },
 
-//     // Textures
-//     // uTextures: { value: advertCubeTexture },
+    // Textures
+    // uTextures: { value: advertCubeTexture },
 
-//     // Frequency
-//     uFrequency: { value: new THREE.Vector2(10, 5) },
-//   },
-// });
+    // Frequency
+    uFrequency: { value: new THREE.Vector2(10, 5) },
+  },
+});
 
-// const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial);
-// // shaderMesh.rotation.x = Math.sin(Math.PI) * 5;
-// // shaderMesh.rotation.y = Math.sin(Math.PI) * 5;
-// // shaderMesh.rotation.z = Math.sin(Math.PI) * 5;
-// scene.add(shaderMesh);
+const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial);
+// shaderMesh.rotation.x = Math.sin(Math.PI) * 5;
+// shaderMesh.rotation.y = Math.sin(Math.PI) * 5;
+// shaderMesh.rotation.z = Math.sin(Math.PI) * 5;
+scene.add(shaderMesh);
 
 // Randomises the points
 
@@ -293,8 +295,8 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 // const pointLight1 = new THREE.PointLight('blue', 1.0);
 // const pointLight2 = new THREE.PointLight('green', 1.0);
 // scene.add(pointLight, pointLight1, pointLight2);
-const directionalLight = new THREE.DirectionalLight('white', 5.0);
-directionalLight.position.set(50, 50, 250);
+const directionalLight = new THREE.DirectionalLight('green', 15.0);
+directionalLight.position.set(0, 0, 250);
 scene.add(directionalLight);
 
 // Setup CCapture Buttons
@@ -339,9 +341,11 @@ const tick = () => {
   textArray.forEach((text, i) => {
     // console.log(textArray[i]);
     textArray[i].rotation.y =
-      (Math.random() - 0.5) * 1.0 * 500.0 * Math.sin(elapsedTime) * 0.1;
+      (Math.random() - 0.5) * 1.0 * 500.0 * Math.sin(elapsedTime) * 0.01;
     textArray[i].position.y =
-      (Math.random() - 0.5) * 1.0 * 500.0 * Math.sin(elapsedTime) * 0.1;
+      (Math.random() - 0.5) * 3.0 * 500.0 * Math.cos(elapsedTime) * 0.1;
+    textArray[i].position.z =
+      (Math.random() - 0.5) * 1.0 * 500.0 * Math.tan(elapsedTime) * 0.1;
     // console.log(i);
     // text.rotation.y = elapsedTime;
     // text.rotation.z = elapsedTime;
