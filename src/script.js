@@ -5,14 +5,6 @@ import Stats from 'stats.js';
 import { GUI } from 'dat.gui';
 import testVertexShader from '/shaders/test/vertex.vs.glsl';
 import testFragmentShader from '/shaders/test/fragment.fs.glsl';
-import CCapture from '../src/ccapture/CCapture';
-
-// Link to the host site: https://naughty-dubinsky-b1df58.netlify.app/
-
-// CCapture
-const recorder = new CCapture({
-  format: 'png',
-});
 
 /**
  * Stats
@@ -108,120 +100,9 @@ gui.add(controls, 'autoRotate').name('Auto Rotate');
  * Objects
  */
 
-// const whiteOfEyeGeo = new THREE.SphereGeometry(26, 64, 64);
-// const whiteOfEyeMat = new THREE.MeshStandardMaterial({
-//   color: 'white',
-//   emissive: 'grey',
-//   roughness: 0.3,
-//   metalness: 0.5,
-//   flatShading: true,
-// });
-// const whiteOfEye = new THREE.Mesh(whiteOfEyeGeo, whiteOfEyeMat);
-// scene.add(whiteOfEye);
-
-// debugObject.torusRadius = 15.5;
-
-// const torusGeo = new THREE.TorusGeometry(5, 4, 4, 45, 6.3);
-// const torusMat = new THREE.MeshStandardMaterial({
-//   color: 'white',
-//   emissive: '#0000ff',
-//   roughness: 0.6,
-//   metalness: 0.7,
-//   flatShading: true,
-// });
-// const torus = new THREE.Mesh(torusGeo, torusMat);
-// torus.position.z = 40;
-// scene.add(torus);
-// gui
-//   .add(debugObject, 'torusRadius')
-//   .min(0)
-//   .max(50)
-//   .step(0.01)
-//   .name('Torus Radius');
-
-// const pupilGeo = new THREE.SphereGeometry(5, 64, 64);
-// const pupilMat = new THREE.MeshBasicMaterial({ color: '#000' });
-// const pupil = new THREE.Mesh(pupilGeo, pupilMat);
-// pupil.position.z = 39;
-// scene.add(pupil);
-// camera.lookAt(pupil.position);
-
-// const beamGeo = new THREE.ConeGeometry(4.4, 15, 15, 1, false, 0, 6.3);
-// const beamMat = new THREE.MeshBasicMaterial({
-//   color: 0xffff00,
-//   transparent: true,
-//   opacity: 0.5,
-// });
-// const beam = new THREE.Mesh(beamGeo, beamMat);
-// beam.position.z = 33;
-// beam.rotation.set(190, 0, 0);
-// scene.add(beam);
-
 /**
  * Font Loader
  */
-
-const textArray = [];
-
-// Function for a name generator
-const fontLoader = new THREE.FontLoader();
-for (let i = 0; i < 100; i++) {
-  fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-    const textGeometry = new THREE.TextGeometry('?', {
-      font: font,
-      size: Math.random() * 10,
-      height: Math.random() * 10,
-      curveSegments: 8,
-      // bevelEnabled: true,
-      // bevelThickness: 0.5,
-      // bevelSize: 0.2,
-      // bevelOffset: 0.1,
-      // bevelSegments: 10,
-      // castShadow: true,
-    });
-    const textMaterial = new THREE.MeshStandardMaterial({
-      color: 'black',
-      emissive: '#000000',
-      roughness: 0.2,
-      metalness: 0.5,
-      // flatShading: true,
-    });
-    // textMaterial.flatShading = false;
-    // textMaterial.displacementBias = 10.5;
-    const text = new THREE.Mesh(textGeometry, textMaterial);
-    text.position.y = (Math.random() - 0.5) * 75;
-    text.position.x = (Math.random() - 0.5) * 75;
-    text.position.z = (Math.random() - 0.5) * 75;
-    textArray.push(text);
-    scene.add(text);
-  });
-}
-
-// for (let i = 0; i < 15; i++) {
-//   fontLoader.load('/fonts/helvetiker_regular.typeface.json', (font) => {
-//     const textGeometry = new THREE.TextGeometry('jour neuf', {
-//       font: font,
-//       size: Math.random() * 5,
-//       height: Math.random() * 15,
-//       curveSegments: 24,
-//       bevelEnabled: true,
-//       bevelThickness: 0.5,
-//       bevelSize: 0.02,
-//       bevelOffset: 0,
-//       bevelSegments: 2,
-//       // castShadow: true,
-//     });
-//     const textMaterial = new THREE.MeshStandardMaterial({ color: 'blue' });
-//     textMaterial.flatShading = false;
-//     // textMaterial.displacementBias = 10.5;
-//     const text = new THREE.Mesh(textGeometry, textMaterial);
-//     text.position.y = (Math.random() - 0.5) * 100;
-//     text.position.x = (Math.random() - 0.5) * 100;
-//     text.position.z = (Math.random() - 0.5) * 100;
-//     // text.lookAt(camera.position);
-//     scene.add(text);
-//   });
-// }
 
 /**
  * Renderer
@@ -242,8 +123,6 @@ renderer.setPixelRatio(window.devicePixelRatio);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 // Color of Shader
-debugObject.depthColor = '#25258c';
-debugObject.surfaceColor = '#acfff5';
 
 // Shader
 const shaderGeometry = new THREE.SphereGeometry(15, 15, 15, 25, 25, 25);
@@ -273,59 +152,12 @@ const shaderMaterial = new THREE.RawShaderMaterial({
 });
 
 const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial);
-// shaderMesh.rotation.x = Math.sin(Math.PI) * 5;
-// shaderMesh.rotation.y = Math.sin(Math.PI) * 5;
-// shaderMesh.rotation.z = Math.sin(Math.PI) * 5;
 scene.add(shaderMesh);
 
-// Randomises the points
-
-// const count = shaderGeometry.attributes.position.count;
-// const randoms = new Float32Array(count);
-// for (let i = 0; i < count; i++) {
-//   randoms[i] = Math.random() * 1;
-// }
-// shaderGeometry.setAttribute('aRandom', new THREE.BufferAttribute(randoms, 1));
-
-/**
- * Lights
- */
-
-// const pointLight = new THREE.PointLight('red', 1.0);
-// const pointLight1 = new THREE.PointLight('blue', 1.0);
-// const pointLight2 = new THREE.PointLight('green', 1.0);
-// scene.add(pointLight, pointLight1, pointLight2);
-const directionalLight = new THREE.DirectionalLight('green', 15.0);
+// Lights
+const directionalLight = new THREE.DirectionalLight('white', 15.0);
 directionalLight.position.set(0, 0, 250);
 scene.add(directionalLight);
-
-// Setup CCapture Buttons
-function setupButtons() {
-  const $start = document.getElementById('start');
-  const $stop = document.getElementById('stop');
-  $start.addEventListener(
-    'click',
-    (e) => {
-      e.preventDefault();
-      recorder.start();
-      $start.style.display = 'none';
-      $stop.style.display = 'block';
-    },
-    false
-  );
-
-  $stop.addEventListener(
-    'click',
-    (e) => {
-      e.preventDefault();
-      recorder.stop();
-      $stop.style.display = 'none';
-      recorder.save();
-    },
-    false
-  );
-}
-setupButtons();
 
 /**
  * Animation
@@ -338,26 +170,11 @@ const tick = () => {
 
   const elapsedTime = clock.getElapsedTime();
 
-  textArray.forEach((text, i) => {
-    // console.log(textArray[i]);
-    textArray[i].rotation.y =
-      (Math.random() - 0.5) * 1.0 * 500.0 * Math.sin(elapsedTime) * 0.01;
-    textArray[i].position.y =
-      (Math.random() - 0.5) * 3.0 * 500.0 * Math.cos(elapsedTime) * 0.1;
-    textArray[i].position.z =
-      (Math.random() - 0.5) * 1.0 * 500.0 * Math.tan(elapsedTime) * 0.1;
-    // console.log(i);
-    // text.rotation.y = elapsedTime;
-    // text.rotation.z = elapsedTime;
-  });
-
   // Update controls
   controls.update();
 
   // Render
   renderer.render(scene, camera);
-
-  recorder.capture(renderer.domElement);
 
   // Call tick again on the next frame
   window.requestAnimationFrame(tick);
