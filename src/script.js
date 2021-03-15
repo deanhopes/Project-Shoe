@@ -5,6 +5,7 @@ import Stats from 'stats.js';
 import { GUI } from 'dat.gui';
 import testVertexShader from '/shaders/test/vertex.vs.glsl';
 import testFragmentShader from '/shaders/test/fragment.fs.glsl';
+import { BufferGeometryUtils } from 'three';
 
 let geometry = [];
 
@@ -150,7 +151,7 @@ gui.add(camera.position, 'z').min(-100).max(100).step(0.01).name('Camera Z');
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-controls.autoRotate = true;
+// controls.autoRotate = true;
 gui.add(controls, 'autoRotate').name('Auto Rotate');
 
 /**
@@ -166,7 +167,7 @@ const renderer = new THREE.WebGLRenderer({
 // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setClearColor(0xa4405e, 1.0);
+renderer.setClearColor(0x000000, 1.0);
 renderer.autoClearColor = true;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -185,24 +186,24 @@ function rotateObject(object, degreeX = 0, degreeY = 0, degreeZ = 0) {
 
 const mesh = new THREE.Object3D();
 mesh.scale.set(100, 100, 100);
-rotateObject(mesh, -90, -45, -180);
+rotateObject(mesh, -180, -180, -180);
 
 geometry = createIndexedPlaneGeometry(100, 150);
-main(geometry, 1);
+main(geometry, 0.5);
 
-let material = new THREE.MeshStandardMaterial({
-  color: 0x123524,
-  emissive: 0xa67af2,
-  metalness: 0.5,
+let material = new THREE.MeshNormalMaterial({
+  // flatShading: true,
+  // morphNormals: true,
+  // morphTargets: true,
   wireframe: true,
 });
 
 mesh.add(new THREE.Mesh(geometry, material));
 
 // Lights
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
-directionalLight.position.set(0, 0, 0);
-scene.add(directionalLight);
+const pointLight = new THREE.PointLight(0xeacca0, 1, 0);
+pointLight.position.set(0, 400, 400);
+scene.add(pointLight);
 
 const modifyGeometry = (elapsedTime) => {
   const pos = geometry.attributes.position.array;
@@ -211,16 +212,18 @@ const modifyGeometry = (elapsedTime) => {
   const uvs = geometry.attributes.uv.array;
 
   for (let i = 0, j = 0; i < pos.length; i += 3, j += 2) {
-    let scale = 0.01 * Math.cos(uvs[j] * 7 + elapsedTime * 0.01);
-    scale += 0.05 * Math.cos(uvs[j + 1] * 9 + elapsedTime * 0.05);
+    let scale = 0.02 * Math.cos(uvs[j] * 7 + elapsedTime * 0.01);
+    scale += 0.02 * Math.cos(uvs[j + 1] * 6 + elapsedTime * 0.05);
 
-    for (let k = 2; k < 6; k += 2) {
-      scale += 0.05 * k * Math.cos(uvs[j] * 9 * k + (k + elapsedTime * 0.05));
+    for (let k = 1; k < 6; k += 3) {
+      scale += 0.1 * k * Math.cos(uvs[j] * 8 * k + (k + elapsedTime * 0.05));
       scale +=
-        0.05 * k * Math.cos(uvs[j + 1] * 7 * k + (k + elapsedTime * 0.05));
+        Math.sin(0.02) *
+        k *
+        Math.cos(uvs[j + 1] * 5 * k + (k + elapsedTime * 0.05));
     }
 
-    scale *= scale * 0.7 * Math.sin(elapsedTime * 0.04 + uvs[j] * 4);
+    scale *= scale * 0.7 * Math.sin(elapsedTime * 0.01 + uvs[j] * 2);
 
     pos[i] = base_pos[i] * (1 + scale);
     pos[i + 1] = base_pos[i + 1] * (1 + scale);
@@ -242,7 +245,7 @@ const tick = () => {
 
   const elapsedTime = clock.getElapsedTime();
 
-  modifyGeometry(elapsedTime);
+  modifyGeometry(elapsedTime * 25);
 
   // Update controls
   controls.update();
@@ -257,5 +260,4 @@ const tick = () => {
 };
 
 tick();
-
 scene.add(mesh);
