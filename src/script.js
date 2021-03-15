@@ -6,6 +6,8 @@ import { GUI } from 'dat.gui';
 import testVertexShader from '/shaders/test/vertex.vs.glsl';
 import testFragmentShader from '/shaders/test/fragment.fs.glsl';
 
+let geometry = [];
+
 /**
  * Stats
  */
@@ -42,13 +44,68 @@ const scene = new THREE.Scene();
 const gui = new GUI();
 
 /**
- * Textures
+ * Objects
  */
-// How to load texture loaders and a displacement texture
-// const textureLoader = new THREE.TextureLoader();
-// const displacementTexture = textureLoader.load(
-//   './textures/displacementMap.png'
-// );
+
+const testCubeGeo = new THREE.BoxGeometry(1, 1, 1);
+const testCubeMat = new THREE.MeshNormalMaterial();
+const testCube = new THREE.Mesh(testCubeGeo, testCubeMat);
+// scene.add(testCube);
+
+// Sphere
+const createIndexedPlaneGeometry = (width, length) => {
+  const geom = new THREE.BufferGeometry();
+
+  const vertices = [];
+  const indices = [];
+  const uvs = [];
+  const width1 = width + 1;
+  const length1 = length + 1;
+  for (let i = 0; i < width1; i++) {
+    for (let j = 0; j < length1; j++) {
+      vertices.push(i / width, 0, j / length);
+      uvs.push(i / width, j / length);
+    }
+  }
+
+  for (let i = 0; i < width; i++) {
+    for (let j = 0; j < length; j++) {
+      let a = i * length1 + j;
+      let b = i * length1 + j + 1;
+      let c = (i + 1) * length1 + j;
+      let d = (i + 1) * length1 + j + 1;
+
+      indices.push(a, c, b);
+      indices.push(b, c, d);
+    }
+  }
+
+  const positions = new Float32Array(vertices);
+  const index = new Uint32Array(indices);
+  const uv = new Float32Array(uvs);
+
+  geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  geom.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+  geom.setIndex(new THREE.BufferAttribute(index, 1));
+
+  return geom;
+};
+
+const main = (geom, radius) => {
+  const pos = geom.attributes.position.array;
+  const uvs = geom.attributes.uv.array;
+
+  const pi = Math.PI;
+
+  for (let i = 0, u = 0, v = 1; i < pos.length; i += 3, u += 2, v += 2) {
+    pos[i] = radius * Math.sin(uvs[u] * pi) * Math.cos(uvs[v] * 2 * pi);
+    pos[i + 1] = radius * Math.sin(uvs[u] * pi) * Math.sin(uvs[v] * 2 * pi);
+    pos[i + 2] = radius * Math.cos(uvs[u] * pi);
+  }
+
+  geom.setAttribute('base_position', geom.attributes.position.clone());
+  geom.computeVertexNormals();
+};
 
 /**
  * Sizes
@@ -78,12 +135,12 @@ window.addEventListener('resize', () => {
 
 // Base camera
 const camera = new THREE.PerspectiveCamera(
-  75,
+  45,
   sizes.width / sizes.height,
   0.1,
-  200
+  1000
 );
-camera.position.set(0, 0, 100);
+camera.position.set(0, 0, 350);
 scene.add(camera);
 
 gui.add(camera.position, 'x').min(-100).max(100).step(0.01).name('Camera X');
@@ -93,16 +150,8 @@ gui.add(camera.position, 'z').min(-100).max(100).step(0.01).name('Camera Z');
 // Controls
 const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
-// controls.autoRotate = true;
+controls.autoRotate = true;
 gui.add(controls, 'autoRotate').name('Auto Rotate');
-
-/**
- * Objects
- */
-
-/**
- * Font Loader
- */
 
 /**
  * Renderer
@@ -117,47 +166,70 @@ const renderer = new THREE.WebGLRenderer({
 // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(window.devicePixelRatio);
-
-// Shaders
-// // Tip 29
+renderer.setClearColor(0xa4405e, 1.0);
+renderer.autoClearColor = true;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-// Color of Shader
+/**
+ * Rotate
+ */
+function rotateObject(object, degreeX = 0, degreeY = 0, degreeZ = 0) {
+  degreeX = (degreeX * Math.PI) / 180;
+  degreeY = (degreeY * Math.PI) / 180;
+  degreeZ = (degreeZ * Math.PI) / 180;
 
-// Shader
-const shaderGeometry = new THREE.SphereGeometry(15, 15, 15, 25, 25, 25);
+  object.rotateX(degreeX);
+  object.rotateY(degreeY);
+  object.rotateZ(degreeZ);
+}
 
-const shaderMaterial = new THREE.RawShaderMaterial({
-  vertexShader: testVertexShader,
-  fragmentShader: testFragmentShader,
+const mesh = new THREE.Object3D();
+mesh.scale.set(100, 100, 100);
+rotateObject(mesh, -90, -45, -180);
+
+geometry = createIndexedPlaneGeometry(100, 150);
+main(geometry, 1);
+
+let material = new THREE.MeshStandardMaterial({
+  color: 0x123524,
+  emissive: 0xa67af2,
+  metalness: 0.5,
   wireframe: true,
-  linewidth: 5,
-  transparent: true,
-  uniforms: {
-    // Time
-    uTime: { value: 0 },
-
-    // Color
-    uDepthColor: { value: new THREE.Color(debugObject.depthColor) },
-    uSurfaceColor: { value: new THREE.Color(debugObject.surfaceColor) },
-    uColorOffset: { value: 0.1 },
-    uColorMultiplier: { value: 15 },
-
-    // Textures
-    // uTextures: { value: advertCubeTexture },
-
-    // Frequency
-    uFrequency: { value: new THREE.Vector2(10, 5) },
-  },
 });
 
-const shaderMesh = new THREE.Mesh(shaderGeometry, shaderMaterial);
-scene.add(shaderMesh);
+mesh.add(new THREE.Mesh(geometry, material));
 
 // Lights
-const directionalLight = new THREE.DirectionalLight('white', 15.0);
-directionalLight.position.set(0, 0, 250);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+directionalLight.position.set(0, 0, 0);
 scene.add(directionalLight);
+
+const modifyGeometry = (elapsedTime) => {
+  const pos = geometry.attributes.position.array;
+  const base_pos = geometry.attributes.base_position.array;
+
+  const uvs = geometry.attributes.uv.array;
+
+  for (let i = 0, j = 0; i < pos.length; i += 3, j += 2) {
+    let scale = 0.01 * Math.cos(uvs[j] * 7 + elapsedTime * 0.01);
+    scale += 0.05 * Math.cos(uvs[j + 1] * 9 + elapsedTime * 0.05);
+
+    for (let k = 2; k < 6; k += 2) {
+      scale += 0.05 * k * Math.cos(uvs[j] * 9 * k + (k + elapsedTime * 0.05));
+      scale +=
+        0.05 * k * Math.cos(uvs[j + 1] * 7 * k + (k + elapsedTime * 0.05));
+    }
+
+    scale *= scale * 0.7 * Math.sin(elapsedTime * 0.04 + uvs[j] * 4);
+
+    pos[i] = base_pos[i] * (1 + scale);
+    pos[i + 1] = base_pos[i + 1] * (1 + scale);
+    pos[i + 2] = base_pos[i + 2] * (1 + scale);
+  }
+
+  geometry.attributes.position.needsUpdate = true;
+  geometry.computeVertexNormals();
+};
 
 /**
  * Animation
@@ -169,6 +241,8 @@ const tick = () => {
   stats.begin();
 
   const elapsedTime = clock.getElapsedTime();
+
+  modifyGeometry(elapsedTime);
 
   // Update controls
   controls.update();
@@ -184,136 +258,4 @@ const tick = () => {
 
 tick();
 
-/**
- * Tips
- */
-
-// // Tip 4
-// console.log(renderer.info);
-
-// // Tip 6
-// scene.remove(cube)
-// cube.geometry.dispose()
-// cube.material.dispose()
-
-// // Tip 10
-// directionalLight.shadow.camera.top = 3;
-// directionalLight.shadow.camera.right = 6;
-// directionalLight.shadow.camera.left = -6;
-// directionalLight.shadow.camera.bottom = -3;
-// directionalLight.shadow.camera.far = 10;
-// directionalLight.shadow.mapSize.set(1024, 1024);
-
-// Camera helper
-// const cameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera);
-// scene.add(cameraHelper);
-
-// // Tip 11
-// cube.castShadow = true;
-// cube.receiveShadow = false;
-
-// torusKnot.castShadow = true;
-// torusKnot.receiveShadow = false;
-
-// sphere.castShadow = true;
-// sphere.receiveShadow = false;
-
-// floor.castShadow = false;
-// floor.receiveShadow = true;
-
-// // // Tip 12
-// renderer.shadowMap.autoUpdate = false;
-// renderer.shadowMap.needsUpdate = true;
-
-// // Tip 18
-// const geometries = [];
-
-// for (let i = 0; i < 50; i++) {
-//   const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-
-//   geometry.rotateX((Math.random() - 0.5) * Math.PI * 2);
-//   geometry.rotateY((Math.random() - 0.5) * Math.PI * 2);
-
-//   geometry.translate(
-//     (Math.random() - 0.5) * 10,
-//     (Math.random() - 0.5) * 10,
-//     (Math.random() - 0.5) * 10
-//   );
-//   geometries.push(geometry);
-// }
-
-// const mergedGeometry = BufferGeometryUtils.mergeBufferGeometries(geometries);
-// const material = new THREE.MeshNormalMaterial();
-// const mesh = new THREE.Mesh(mergedGeometry, material);
-
-// scene.add(mesh);
-
-// // Tip 19
-// const geometry = new THREE.BoxGeometry(0.5, 0.5, 0.5);
-// const material = new THREE.MeshNormalMaterial();
-// for (let i = 0; i < 50; i++) {
-//   const mesh = new THREE.Mesh(geometry, material);
-//   mesh.position.x = (Math.random() - 0.5) * 10;
-//   mesh.position.y = (Math.random() - 0.5) * 10;
-//   mesh.position.z = (Math.random() - 0.5) * 10;
-//   mesh.rotation.x = (Math.random() - 0.5) * Math.PI * 2;
-//   mesh.rotation.y = (Math.random() - 0.5) * Math.PI * 2;
-
-//   scene.add(mesh);
-// }
-
-// // Tip 20
-// const cubeGeometry = new THREE.SphereGeometry(0.2, 32, 32);
-
-// const pointSpheres = (elapsedTime) => {
-//   for (let i = 0; i < 50; i++) {
-//     const material = new THREE.PointsMaterial({
-//       size: 0.005,
-//       color: '#CCFFFF',
-//       // sizeAttenuation: true,
-//     });
-
-//     const mesh = new THREE.Points(cubeGeometry, material);
-//     mesh.position.x = (Math.random() - 0.5) * 10;
-//     mesh.position.y = (Math.random() - 0.5) * 10;
-//     mesh.position.z = (Math.random() - 0.5) * 10;
-//     mesh.rotation.x = Math.sin(
-//       elapsedTime + (Math.random() - 0.5) * Math.PI * 2
-//     );
-//     mesh.rotation.y = (Math.random() - 0.5) * Math.PI * 2;
-
-//     scene.add(mesh);
-//   }
-// };
-
-// // Tip 22 -- Create multiple box geometries with random rotations and positions with one draw call
-// const cubeGeometry = new THREE.SphereGeometry(0.1, 32, 32);
-
-// const cubeMaterial = new THREE.PointsMaterial({
-//   size: 0.2,
-//   sizeAttenuation: true,
-// });
-
-// const mesh = new THREE.InstancedMesh(cubeGeometry, cubeMaterial, 400);
-// // Add this for better performance
-// mesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
-
-// scene.add(mesh);
-
-// for (let i = 0; i < 100; i++) {
-//   // Create position
-//   const position = new THREE.Vector3(
-//     (Math.random() - 0.5) * 10,
-//     (Math.random() - 0.5) * 10,
-//     (Math.random() - 0.5) * 10
-//   );
-
-//   // Rotation
-//   const quarternion = new THREE.Quaternion();
-//   quarternion.setFromEuler(new THREE.Euler(0, 0, 0));
-//   // Create matrxies
-//   const matrix = new THREE.Matrix4();
-//   matrix.makeRotationFromQuaternion(quarternion);
-//   matrix.setPosition(position);
-//   mesh.setMatrixAt(i, matrix);
-// }
+scene.add(mesh);

@@ -1,13 +1,9 @@
 precision mediump float;
 
-uniform vec3 uDepthColor;
-uniform vec3 uSurfaceColor;
-uniform float uColorOffset;
-uniform float uColorMultiplier;
-
-varying float vRandom;
+varying vec3 vNormal;
+varying vec3 vViewPosition;
 
 void main()
 {
-  gl_FragColor = vec4(1.0, 1.0, 1.0, 0.1);
+  gl_FragColor = vec4(vViewPosition, 0.5);
 }
