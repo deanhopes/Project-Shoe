@@ -64,15 +64,56 @@ const texture = textureLoader.load('/textures/Frame 20.png');
  * Objects
  */
 
-const testCubeGeo = new THREE.BoxGeometry(1, 1, 1);
-const testCubeMat = new THREE.MeshNormalMaterial();
-const testCube = new THREE.Mesh(testCubeGeo, testCubeMat);
-// scene.add(testCube);
+const sphereGeometry = new THREE.SphereGeometry(0.2, 8, 8);
+
+const sphereMaterial = new THREE.MeshNormalMaterial();
+
+const sphereMesh = new THREE.InstancedMesh(sphereGeometry, sphereMaterial, 900);
+// Add this for better performance
+sphereMesh.instanceMatrix.setUsage(THREE.DynamicDrawUsage);
+scene.add(sphereMesh);
+
+for (let i = 0; i < 900; i++) {
+  // Create position
+  const position = new THREE.Vector3(
+    (Math.random() - 0.5) * 200,
+    (Math.random() - 0.5) * 200,
+    Math.random() * 200
+  );
+
+  // Rotation
+  const quarternion = new THREE.Quaternion();
+  quarternion.setFromEuler(
+    new THREE.Euler(
+      (Math.random() - 0.5) * Math.PI * 2,
+      (Math.random() - 0.5) * Math.PI * 2,
+      (Math.random() - 0.5) * Math.PI * 2
+    )
+  );
+  // Create matrxies
+  const matrix = new THREE.Matrix4();
+  matrix.makeRotationFromQuaternion(quarternion);
+  matrix.setPosition(position);
+  sphereMesh.setMatrixAt(i, matrix);
+}
 
 const planeGeo = new THREE.PlaneGeometry(200, 250);
 const planeMat = new THREE.MeshBasicMaterial({ map: texture });
 const plane = new THREE.Mesh(planeGeo, planeMat);
 scene.add(plane);
+
+const planeGeo1 = new THREE.PlaneGeometry(200, 250);
+const planeMat1 = new THREE.MeshNormalMaterial({
+  transparent: true,
+  opacity: 0.1,
+  depthWrite: true,
+  depthTest: true,
+  alphaTest: 0.9,
+  flatShading: false,
+  wireframe: false,
+});
+const plane1 = new THREE.Mesh(planeGeo1, planeMat1);
+scene.add(plane1);
 
 // Sphere
 const createIndexedPlaneGeometry = (width, length) => {
@@ -162,7 +203,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(0, 0, 250);
+camera.position.set(0, 0, 175);
 scene.add(camera);
 
 gui.add(camera.position, 'x').min(-100).max(100).step(0.01).name('Camera X');
@@ -210,7 +251,7 @@ mesh.scale.set(120, 120, 120);
 rotateObject(mesh, -180, -90, 90);
 
 geometry = createIndexedPlaneGeometry(100, 150);
-main(geometry, 0.5);
+main(geometry, 0.6);
 
 let material = new THREE.MeshNormalMaterial({
   // flatShading: true,
@@ -222,9 +263,24 @@ let material = new THREE.MeshNormalMaterial({
 mesh.add(new THREE.Mesh(geometry, material));
 
 // Lights
-const pointLight = new THREE.PointLight(0xeacca0, 2);
-pointLight.position.set(0, 0, 200);
-scene.add(pointLight);
+const pinkDirectionalLight = new THREE.DirectionalLight('pink', 15);
+pinkDirectionalLight.position.set(200, -200, -200);
+
+const greenDirectionalLight = new THREE.DirectionalLight('blue', 15);
+greenDirectionalLight.position.set(-200, -200, -200);
+
+const pointLight = new THREE.PointLight('white', 10);
+pointLight.position.set(0, 0, 50);
+const pointLightHelper = new THREE.PointLightHelper(pointLight);
+scene.add(pointLightHelper);
+scene.add(pinkDirectionalLight, greenDirectionalLight, pointLight);
+
+const ambientLight = new THREE.AmbientLight('white', 0.9);
+scene.add(ambientLight);
+
+/**
+ * Sphere geometry
+ */
 
 const modifyGeometry = (elapsedTime) => {
   const pos = geometry.attributes.position.array;
@@ -233,22 +289,20 @@ const modifyGeometry = (elapsedTime) => {
   const uvs = geometry.attributes.uv.array;
 
   for (let i = 0, j = 0; i < pos.length; i += 3, j += 2) {
-    let scale = 0.02 * Math.cos(uvs[j] * 7 + elapsedTime * 0.01);
-    scale += 0.02 * Math.cos(uvs[j + 1] * 6 + elapsedTime * 0.05);
+    let scale = 0.03 * Math.cos(uvs[j] * 6 + elapsedTime * 0.3);
+    scale += 0.03 * Math.cos(uvs[j + 1] * 9 + elapsedTime * 0.3);
 
-    for (let k = 2; k < 4; k += 2) {
-      scale += 0.1 * k * Math.cos(uvs[j] * 8 * k + (k + elapsedTime * 0.05));
+    for (let k = 2; k < 3; k += 2) {
+      scale += 0.3 * k * Math.sin(uvs[j] * 9 * k + (k + elapsedTime * 0.3));
       scale +=
-        Math.sin(0.02) *
-        k *
-        Math.cos(uvs[j + 1] * 5 * k + (k + elapsedTime * 0.05));
+        0.06 * k * Math.sin(uvs[j + 1] * 9 * k + (k + elapsedTime * 0.3));
     }
 
-    scale *= scale * 0.7 * Math.sin(elapsedTime * 0.01 + uvs[j] * 2);
+    scale *= scale * 0.3 * Math.sin(elapsedTime * 0.03 + uvs[j] * 3);
 
-    pos[i] = base_pos[i] * (1 + scale);
-    pos[i + 1] = base_pos[i + 1] * (1 + scale);
-    pos[i + 2] = base_pos[i + 2] * (1 + scale);
+    pos[i] = base_pos[i] * (1 + scale * 0.1);
+    pos[i + 1] = base_pos[i + 1] * (1 + scale * 0.1);
+    pos[i + 2] = base_pos[i + 2] * (1 + scale * 0.1);
   }
 
   geometry.attributes.position.needsUpdate = true;
@@ -266,7 +320,8 @@ const tick = () => {
 
   const elapsedTime = clock.getElapsedTime();
 
-  modifyGeometry(elapsedTime * 25);
+  sphereMesh.rotation.set(Math.sin(elapsedTime) * 0.03, 0, 0);
+  modifyGeometry(Math.sin(elapsedTime) * 9);
 
   // Update controls
   controls.update();
