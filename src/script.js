@@ -6,6 +6,7 @@ import { GUI } from 'dat.gui';
 import testVertexShader from '/shaders/test/vertex.vs.glsl';
 import testFragmentShader from '/shaders/test/fragment.fs.glsl';
 import { BufferGeometryUtils } from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 let geometry = [];
 
@@ -44,6 +45,21 @@ const scene = new THREE.Scene();
 // GUI
 const gui = new GUI();
 
+// GLTF Loader
+const gltfLoader = new GLTFLoader();
+gltfLoader.load('/models/shoe/glTF/MaterialsVariantsShoe.gltf', (gltf) => {
+  gltf.scene.scale.set(250, 250, 250);
+  gltf.scene.position.set(-5, -12, 100);
+  gltf.scene.rotation.set(0, 0, 125);
+  scene.add(gltf.scene);
+});
+console.log(scene);
+
+// Texture loader
+
+const textureLoader = new THREE.TextureLoader();
+const texture = textureLoader.load('/textures/Frame 20.png');
+
 /**
  * Objects
  */
@@ -52,6 +68,11 @@ const testCubeGeo = new THREE.BoxGeometry(1, 1, 1);
 const testCubeMat = new THREE.MeshNormalMaterial();
 const testCube = new THREE.Mesh(testCubeGeo, testCubeMat);
 // scene.add(testCube);
+
+const planeGeo = new THREE.PlaneGeometry(200, 250);
+const planeMat = new THREE.MeshBasicMaterial({ map: texture });
+const plane = new THREE.Mesh(planeGeo, planeMat);
+scene.add(plane);
 
 // Sphere
 const createIndexedPlaneGeometry = (width, length) => {
@@ -136,12 +157,12 @@ window.addEventListener('resize', () => {
 
 // Base camera
 const camera = new THREE.PerspectiveCamera(
-  45,
+  75,
   sizes.width / sizes.height,
   0.1,
   1000
 );
-camera.position.set(0, 0, 350);
+camera.position.set(0, 0, 250);
 scene.add(camera);
 
 gui.add(camera.position, 'x').min(-100).max(100).step(0.01).name('Camera X');
@@ -167,7 +188,7 @@ const renderer = new THREE.WebGLRenderer({
 // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setClearColor(0x000000, 1.0);
+renderer.setClearColor(0x404040, 1.0);
 renderer.autoClearColor = true;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -185,8 +206,8 @@ function rotateObject(object, degreeX = 0, degreeY = 0, degreeZ = 0) {
 }
 
 const mesh = new THREE.Object3D();
-mesh.scale.set(100, 100, 100);
-rotateObject(mesh, -180, -180, -180);
+mesh.scale.set(120, 120, 120);
+rotateObject(mesh, -180, -90, 90);
 
 geometry = createIndexedPlaneGeometry(100, 150);
 main(geometry, 0.5);
@@ -201,8 +222,8 @@ let material = new THREE.MeshNormalMaterial({
 mesh.add(new THREE.Mesh(geometry, material));
 
 // Lights
-const pointLight = new THREE.PointLight(0xeacca0, 1, 0);
-pointLight.position.set(0, 400, 400);
+const pointLight = new THREE.PointLight(0xeacca0, 2);
+pointLight.position.set(0, 0, 200);
 scene.add(pointLight);
 
 const modifyGeometry = (elapsedTime) => {
@@ -215,7 +236,7 @@ const modifyGeometry = (elapsedTime) => {
     let scale = 0.02 * Math.cos(uvs[j] * 7 + elapsedTime * 0.01);
     scale += 0.02 * Math.cos(uvs[j + 1] * 6 + elapsedTime * 0.05);
 
-    for (let k = 1; k < 6; k += 3) {
+    for (let k = 2; k < 4; k += 2) {
       scale += 0.1 * k * Math.cos(uvs[j] * 8 * k + (k + elapsedTime * 0.05));
       scale +=
         Math.sin(0.02) *
