@@ -105,7 +105,7 @@ scene.add(plane);
 const planeGeo1 = new THREE.PlaneGeometry(200, 250);
 const planeMat1 = new THREE.MeshNormalMaterial({
   transparent: true,
-  opacity: 0.1,
+  opacity: 0.15,
   depthWrite: true,
   depthTest: true,
   alphaTest: 0.9,
@@ -229,7 +229,7 @@ const renderer = new THREE.WebGLRenderer({
 // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setClearColor(0x404040, 1.0);
+renderer.setClearColor(0x00, 1.0);
 renderer.autoClearColor = true;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -288,17 +288,17 @@ const modifyGeometry = (elapsedTime) => {
 
   const uvs = geometry.attributes.uv.array;
 
-  for (let i = 0, j = 0; i < pos.length; i += 3, j += 2) {
+  for (let i = 0, j = 0; i < pos.length; i += 6, j += 2) {
     let scale = 0.03 * Math.cos(uvs[j] * 6 + elapsedTime * 0.3);
     scale += 0.03 * Math.cos(uvs[j + 1] * 9 + elapsedTime * 0.3);
 
     for (let k = 2; k < 3; k += 2) {
-      scale += 0.3 * k * Math.sin(uvs[j] * 9 * k + (k + elapsedTime * 0.3));
+      scale += 0.3 * k * Math.sin(uvs[j] * 18 * k + (k + elapsedTime * 0.3));
       scale +=
-        0.06 * k * Math.sin(uvs[j + 1] * 9 * k + (k + elapsedTime * 0.3));
+        0.06 * k * Math.sin(uvs[j + 1] * 18 * k + (k + elapsedTime * 0.3));
     }
 
-    scale *= scale * 0.3 * Math.sin(elapsedTime * 0.03 + uvs[j] * 3);
+    scale *= scale * 0.3 * Math.sin(elapsedTime * 0.3 + uvs[j] * 3);
 
     pos[i] = base_pos[i] * (1 + scale * 0.1);
     pos[i + 1] = base_pos[i + 1] * (1 + scale * 0.1);
