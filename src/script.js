@@ -48,7 +48,7 @@ const gui = new GUI();
 // GLTF Loader
 const gltfLoader = new GLTFLoader();
 gltfLoader.load('/models/shoe/glTF/MaterialsVariantsShoe.gltf', (gltf) => {
-  gltf.scene.scale.set(250, 250, 250);
+  gltf.scene.scale.set(350, 350, 350);
   gltf.scene.position.set(-5, -12, 100);
   gltf.scene.rotation.set(0, 0, 125);
   scene.add(gltf.scene);
@@ -98,14 +98,19 @@ for (let i = 0; i < 900; i++) {
 }
 
 const planeGeo = new THREE.PlaneGeometry(200, 250);
-const planeMat = new THREE.MeshBasicMaterial({ map: texture });
+const planeMat = new THREE.MeshBasicMaterial({
+  map: texture,
+  transparent: true,
+  opacity: 1,
+});
+
 const plane = new THREE.Mesh(planeGeo, planeMat);
 scene.add(plane);
 
 const planeGeo1 = new THREE.PlaneGeometry(200, 250);
 const planeMat1 = new THREE.MeshNormalMaterial({
   transparent: true,
-  opacity: 0.15,
+  opacity: 0.11,
   depthWrite: true,
   depthTest: true,
   alphaTest: 0.9,
@@ -114,6 +119,14 @@ const planeMat1 = new THREE.MeshNormalMaterial({
 });
 const plane1 = new THREE.Mesh(planeGeo1, planeMat1);
 scene.add(plane1);
+
+// Circle
+const circleGeo = new THREE.CircleGeometry(5, 32);
+const circleMat = new THREE.MeshNormalMaterial();
+const circle = new THREE.Mesh(circleGeo, circleMat);
+circle.position.set(95, 120, 1);
+circle.scale.set(4, 4, 5);
+// scene.add(circle);
 
 // Sphere
 const createIndexedPlaneGeometry = (width, length) => {
@@ -171,6 +184,193 @@ const main = (geom, radius) => {
 };
 
 /**
+ * Fog
+ */
+
+const debounce = (callback, duration) => {
+  var timer;
+  return function (event) {
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      callback(event);
+    }, duration);
+  };
+};
+
+const loadTexs = (imgs, callback) => {
+  const texLoader = new THREE.TextureLoader();
+  const length = Object.keys(imgs).length;
+  const loadedTexs = {};
+  let count = 0;
+
+  texLoader.crossOrigin = 'anonymous';
+
+  for (var key in imgs) {
+    const k = key;
+    if (imgs.hasOwnProperty(k)) {
+      texLoader.load(imgs[k], (tex) => {
+        tex.repeat = THREE.RepeatWrapping;
+        loadedTexs[k] = tex;
+        count++;
+        if (count >= length) callback(loadedTexs);
+      });
+    }
+  }
+};
+
+class Fog {
+  constructor() {
+    this.uniforms = {
+      time: {
+        type: 'f',
+        value: 0,
+      },
+      tex: {
+        type: 't',
+        value: null,
+      },
+    };
+    this.num = 200;
+    this.obj = null;
+  }
+  createObj(tex) {
+    // Define Geometries
+    const geometry = new THREE.InstancedBufferGeometry();
+    const baseGeometry = new THREE.PlaneBufferGeometry(1100, 1100, 20, 20);
+
+    // Copy attributes of the base Geometry to the instancing Geometry
+    geometry.addAttribute('position', baseGeometry.attributes.position);
+    geometry.addAttribute('normal', baseGeometry.attributes.normal);
+    geometry.addAttribute('uv', baseGeometry.attributes.uv);
+    geometry.setIndex(baseGeometry.index);
+
+    // Define attributes of the instancing geometry
+    const instancePositions = new THREE.InstancedBufferAttribute(
+      new Float32Array(this.num * 3),
+      3,
+      1
+    );
+    const delays = new THREE.InstancedBufferAttribute(
+      new Float32Array(this.num),
+      1,
+      1
+    );
+    const rotates = new THREE.InstancedBufferAttribute(
+      new Float32Array(this.num),
+      1,
+      1
+    );
+    for (var i = 0, ul = this.num; i < ul; i++) {
+      instancePositions.setXYZ(
+        i,
+        (Math.random() * 2 - 1) * 850,
+        0,
+        (Math.random() * 2 - 1) * 300
+      );
+      delays.setXYZ(i, Math.random());
+      rotates.setXYZ(i, Math.random() * 2 + 1);
+    }
+    geometry.addAttribute('instancePosition', instancePositions);
+    geometry.addAttribute('delay', delays);
+    geometry.addAttribute('rotate', rotates);
+
+    // Define Material
+    const material = new THREE.RawShaderMaterial({
+      uniforms: this.uniforms,
+      vertexShader: `
+        attribute vec3 position;
+        attribute vec2 uv;
+        attribute vec3 instancePosition;
+        attribute float delay;
+        attribute float rotate;
+
+        uniform mat4 projectionMatrix;
+        uniform mat4 modelViewMatrix;
+        uniform float time;
+
+        varying vec3 vPosition;
+        varying vec2 vUv;
+        varying vec3 vColor;
+        varying float vBlink;
+
+        const float duration = 200.0;
+
+        mat4 calcRotateMat4Z(float radian) {
+          return mat4(
+            cos(radian), -sin(radian), 0.0, 0.0,
+            sin(radian), cos(radian), 0.0, 0.0,
+            0.0, 0.0, 1.0, 0.0,
+            0.0, 0.0, 0.0, 1.0
+          );
+        }
+        vec3 convertHsvToRgb(vec3 c) {
+          vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+          vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+          return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+        }
+
+        void main(void) {
+          float now = mod(time + delay * duration, duration) / duration;
+
+          mat4 rotateMat = calcRotateMat4Z(radians(rotate * 360.0) + time * 0.1);
+          vec3 rotatePosition = (rotateMat * vec4(position, 1.0)).xyz;
+
+          vec3 moveRise = vec3(
+            (now * 2.0 - 1.0) * (2500.0 - (delay * 2.0 - 1.0) * 2000.0),
+            (now * 2.0 - 1.0) * 2000.0,
+            sin(radians(time * 50.0 + delay + length(position))) * 30.0
+            );
+          vec3 updatePosition = instancePosition + moveRise + rotatePosition;
+
+          vec3 hsv = vec3(time * 0.1 + delay * 0.2 + length(instancePosition) * 100.0, 0.5 , 0.8);
+          vec3 rgb = convertHsvToRgb(hsv);
+          float blink = (sin(radians(now * 360.0 * 20.0)) + 1.0) * 0.88;
+
+          vec4 mvPosition = modelViewMatrix * vec4(updatePosition, 1.0);
+
+          vPosition = position;
+          vUv = uv;
+          vColor = rgb;
+          vBlink = blink;
+
+          gl_Position = projectionMatrix * mvPosition;
+        }
+      `,
+      fragmentShader: `
+        precision highp float;
+
+        uniform sampler2D tex;
+
+        varying vec3 vPosition;
+        varying vec2 vUv;
+        varying vec3 vColor;
+        varying float vBlink;
+
+        void main() {
+          vec2 p = vUv * 2.0 - 1.0;
+
+          vec4 texColor = texture2D(tex, vUv);
+          vec3 color = (texColor.rgb - vBlink * length(p) * 0.8) * vColor;
+          float opacity = texColor.a * 0.36;
+
+          gl_FragColor = vec4(color, opacity);
+        }
+      `,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+    this.uniforms.tex.value = tex;
+
+    // Create Object3D
+    this.obj = new THREE.Mesh(geometry, material);
+  }
+  render(time) {
+    this.uniforms.time.value += time;
+  }
+}
+
+/**
  * Sizes
  */
 const sizes = {
@@ -203,7 +403,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(0, 0, 175);
+camera.position.set(0, 0, 225);
 scene.add(camera);
 
 gui.add(camera.position, 'x').min(-100).max(100).step(0.01).name('Camera X');
@@ -229,7 +429,7 @@ const renderer = new THREE.WebGLRenderer({
 // renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(window.devicePixelRatio);
-renderer.setClearColor(0x00, 1.0);
+renderer.setClearColor(0x1e1f21, 1.0);
 renderer.autoClearColor = true;
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
@@ -263,10 +463,10 @@ let material = new THREE.MeshNormalMaterial({
 mesh.add(new THREE.Mesh(geometry, material));
 
 // Lights
-const pinkDirectionalLight = new THREE.DirectionalLight('pink', 15);
+const pinkDirectionalLight = new THREE.DirectionalLight('pink', 5);
 pinkDirectionalLight.position.set(200, -200, -200);
 
-const greenDirectionalLight = new THREE.DirectionalLight('blue', 15);
+const greenDirectionalLight = new THREE.DirectionalLight('blue', 5);
 greenDirectionalLight.position.set(-200, -200, -200);
 
 const pointLight = new THREE.PointLight('white', 10);
@@ -279,8 +479,10 @@ const ambientLight = new THREE.AmbientLight('white', 0.9);
 scene.add(ambientLight);
 
 /**
- * Sphere geometry
+ * Geometries
  */
+
+// Circle Mesh Normal Object
 
 const modifyGeometry = (elapsedTime) => {
   const pos = geometry.attributes.position.array;
@@ -289,13 +491,13 @@ const modifyGeometry = (elapsedTime) => {
   const uvs = geometry.attributes.uv.array;
 
   for (let i = 0, j = 0; i < pos.length; i += 6, j += 2) {
-    let scale = 0.03 * Math.cos(uvs[j] * 6 + elapsedTime * 0.3);
-    scale += 0.03 * Math.cos(uvs[j + 1] * 9 + elapsedTime * 0.3);
+    let scale = 0.3 * Math.sin(uvs[j] * 9 + elapsedTime * 0.3);
+    scale += 0.3 * Math.sin(uvs[j + 1] * 9 + elapsedTime * 0.3);
 
     for (let k = 2; k < 3; k += 2) {
-      scale += 0.3 * k * Math.sin(uvs[j] * 18 * k + (k + elapsedTime * 0.3));
+      scale += 0.3 * k * Math.cos(uvs[j] * 27 * k + (k + elapsedTime * 0.3));
       scale +=
-        0.06 * k * Math.sin(uvs[j + 1] * 18 * k + (k + elapsedTime * 0.3));
+        0.3 * k * Math.cos(uvs[j + 1] * 27 * k + (k + elapsedTime * 0.3));
     }
 
     scale *= scale * 0.3 * Math.sin(elapsedTime * 0.3 + uvs[j] * 3);
